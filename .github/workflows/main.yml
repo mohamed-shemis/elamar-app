@@ -8,29 +8,35 @@ jobs:
   build:
     runs-on: windows-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Setup Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version: 20
+          cache: 'npm'
           
       - name: Install dependencies
         run: npm install
-        
+        env:
+          ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+          
       - name: Build Windows app
         run: npm run build:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
           
-      - name: Upload Release
-        uses: softprops/action-gh-release@v1
+      - name: Create Release
+        uses: softprops/action-gh-release@v2
         with:
           tag_name: v1.0.${{ github.run_number }}
-          name: ELAMAR v1.0.${{ github.run_number }}
+          name: "ELAMAR v1.0.${{ github.run_number }}"
           files: dist/*.exe
           body: |
-            ## تحميل برنامج ELAMAR
-            اضغط على الملف أدناه لتحميل وتثبيت البرنامج
+            ## ⬇️ تحميل برنامج ELAMAR
+            اضغط على الملف أدناه لتحميل وتثبيت البرنامج على ويندوز
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
