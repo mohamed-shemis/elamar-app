@@ -1,0 +1,36 @@
+name: Build ELAMAR App
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+          
+      - name: Install dependencies
+        run: npm install
+        
+      - name: Build Windows app
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Upload Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v1.0.${{ github.run_number }}
+          name: ELAMAR v1.0.${{ github.run_number }}
+          files: dist/*.exe
+          body: |
+            ## تحميل برنامج ELAMAR
+            اضغط على الملف أدناه لتحميل وتثبيت البرنامج
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
