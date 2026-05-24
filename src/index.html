@@ -251,8 +251,9 @@ onAuthStateChanged(auth, async (user) => {
     }
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app-shell').style.display='flex';
+    window._pg = 'd';
     loadFirebase();
-    goto('d'); loadNotifications();
+    loadNotifications();
   } else {
     document.getElementById('login-screen').style.display='flex';
     document.getElementById('app-shell').style.display='none';
@@ -269,10 +270,14 @@ function loadFirebase(){
       uploadSeed();
     }
     setSyncStatus('online','متصل ومحدّث');
-    if(window._pg) goto(window._pg);
+    if(window._pg){ goto(window._pg); window._pg=null; }
   },(err)=>{
     setSyncStatus('offline','غير متصل');
-    if(!window._recs||window._recs.length===0) window._recs=JSON.parse(JSON.stringify(window._SEED));
+    // Fallback to seed data if offline
+    if(!window._recs||window._recs.length===0){
+      window._recs=JSON.parse(JSON.stringify(window._SEED));
+      if(window._pg){ goto(window._pg); window._pg=null; }
+    }
   });
 }
 
@@ -1108,8 +1113,9 @@ onAuthStateChanged(auth, async (user) => {
     }
     document.getElementById('login-screen').style.display='none';
     document.getElementById('app-shell').style.display='flex';
+    window._pg = 'd';
     loadFirebase();
-    goto('d'); loadNotifications();
+    loadNotifications();
   } else {
     document.getElementById('login-screen').style.display='flex';
     document.getElementById('app-shell').style.display='none';
@@ -1126,10 +1132,14 @@ function loadFirebase(){
       uploadSeed();
     }
     setSyncStatus('online','متصل ومحدّث');
-    if(window._pg) goto(window._pg);
+    if(window._pg){ goto(window._pg); window._pg=null; }
   },(err)=>{
     setSyncStatus('offline','غير متصل');
-    if(!window._recs||window._recs.length===0) window._recs=JSON.parse(JSON.stringify(window._SEED));
+    // Fallback to seed data if offline
+    if(!window._recs||window._recs.length===0){
+      window._recs=JSON.parse(JSON.stringify(window._SEED));
+      if(window._pg){ goto(window._pg); window._pg=null; }
+    }
   });
 }
 
