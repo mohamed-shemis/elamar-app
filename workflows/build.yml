@@ -1,0 +1,44 @@
+name: Build ELAMAR
+
+on:
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install
+        run: npm install
+        env:
+          ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+
+      - name: Build
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.${{ github.run_number }}
+          name: "ELAMAR v1.${{ github.run_number }}"
+          files: dist/*.exe
+          body: |
+            ## ⬇️ تحميل / Download ELAMAR
+            اضغط على الملف أدناه للتحميل / Click the file below to download
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
