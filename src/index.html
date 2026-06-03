@@ -495,8 +495,8 @@ window.syncToSheets=async()=>{
   try{
     const token=await window._getToken();
     const rows=[HDRS,...window._recs.map(r=>HDRS.map(h=>r[h]||''))];
-    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/Sheet1!A1:Z10000:clear`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'}});
-    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/Sheet1!A1?valueInputOption=RAW`,{method:'PUT',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({values:rows})});
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${encodeURIComponent('كارته معدات')}!A1:Z10000:clear`,{method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'}});
+    await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${encodeURIComponent('كارته معدات')}!A1?valueInputOption=RAW`,{method:'PUT',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},body:JSON.stringify({values:rows})});
     setSS('s-on');toast(window._lang==='en'?'Synced to Google Sheets ✓':'تم الرفع لـ Google Sheets ✓');
   }catch(e){setSS('s-off');toast(window._lang==='en'?'Sync error':'خطأ في المزامنة','err');}
 };
@@ -505,13 +505,72 @@ window.syncFromSheets=async()=>{
   setSS('s-sync');
   try{
     const token=await window._getToken();
-    const res=await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/Sheet1!A1:Z10000`,{headers:{Authorization:`Bearer ${token}`}});
-    const d=await res.json();const rows=d.values||[];
-    if(rows.length<2){toast(window._lang==='en'?'Sheet is empty':'الشيت فاضي','err');return;}
-    const hdrs=rows[0];
-    window._recs=rows.slice(1).map((row,i)=>{const o={_fbKey:null};hdrs.forEach((h,j)=>o[h]=row[j]||'');o.id=o.id||i+1;o.qty=parseFloat(o.qty)||0;o.unitPrice=parseFloat(o.unitPrice)||0;o.total=parseFloat(o.total)||0;return o;});
-    setSS('s-on');toast(`${window._recs.length} ${window._lang==='en'?'records imported ✓':'سجل تم استيراده ✓'}`);goto(window._pg||'d');
-  }catch(e){setSS('s-off');toast(window._lang==='en'?'Import error':'خطأ في الاستيراد','err');}
+    if(!token){toast('فشل الحصول على Token','err');setSS('s-off');return;}
+
+    // Map Arabic headers to English field names
+    const AR_MAP={
+      'كود المعدة':'equipmentCode','اسم المعدة':'equipmentName','البيان':'description',
+      'الوحدة':'unit','الكمية':'qty','سعر الوحدة':'unitPrice','الإجمالي':'total',
+      'نوع المصروف':'expenseType','حالة المعدة':'status','الموقع':'location',
+      'التاريخ':'date','رقم الفاتوره':'invoiceNo','رقم الفاتورة':'invoiceNo',
+      'المورد':'supplier','من عهده':'custodian','الاعتماد':'approval',
+      // English headers (if already uploaded by app)
+      'id':'id','equipmentCode':'equipmentCode','equipmentName':'equipmentName',
+      'description':'description','unit':'unit','qty':'qty','unitPrice':'unitPrice',
+      'total':'total','expenseType':'expenseType','status':'status','location':'location',
+      'date':'date','invoiceNo':'invoiceNo','supplier':'supplier','custodian':'custodian',
+      'approval':'approval','updatedBy':'updatedBy','updatedAt':'updatedAt',
+    };
+
+    // Try sheet by name first, then by index
+    const sheetName = encodeURIComponent('كارته معدات');
+    let res = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/${sheetName}!A1:Z5000`,
+      {headers:{Authorization:`Bearer ${token}`}}
+    );
+    let d = await res.json();
+
+    // If failed, try first sheet (index)
+    if(!d.values || d.values.length < 2){
+      res = await fetch(
+        `https://sheets.googleapis.com/v4/spreadsheets/${SID}/values/A1:Z5000`,
+        {headers:{Authorization:`Bearer ${token}`}}
+      );
+      d = await res.json();
+    }
+
+    const rows = d.values||[];
+    if(rows.length < 2){
+      const errMsg = d.error ? `خطأ: ${d.error.message}` : (window._lang==='en'?'Sheet is empty or cannot be read':'الشيت فاضي أو لا يمكن قراءته');
+      toast(errMsg,'err');
+      setSS('s-off');
+      return;
+    }
+
+    const hdrs = rows[0];
+    window._recs = rows.slice(1).filter(row=>row.some(c=>c)).map((row,i)=>{
+      const o={_fbKey:null};
+      hdrs.forEach((h,j)=>{
+        const key = AR_MAP[h] || h;
+        o[key] = row[j]||'';
+      });
+      o.id = o.id || i+1;
+      o.qty = parseFloat(o.qty)||0;
+      o.unitPrice = parseFloat(o.unitPrice)||0;
+      o.total = parseFloat(o.total)||0;
+      if(!o.status) o.status='جاهزة للعمل';
+      if(!o.expenseType) o.expenseType='أخرى';
+      return o;
+    });
+
+    setSS('s-on');
+    toast(`${window._recs.length} ${window._lang==='en'?'records imported ✓':'سجل تم استيراده ✓'}`);
+    goto(window._pg||'d');
+  }catch(e){
+    console.error('Sync error:',e);
+    setSS('s-off');
+    toast((window._lang==='en'?'Import error: ':'خطأ: ')+e.message,'err');
+  }
 };
 
 function setSS(cls){
