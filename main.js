@@ -3,7 +3,7 @@ const path = require('path');
 function createWindow() {
   const win = new BrowserWindow({
     width: 1280, height: 820, minWidth: 400, minHeight: 600,
-    title: 'ELAMAR – برنامج إدارة المعدات',
+    title: 'ELAMAR – Equipment Management',
     icon: path.join(__dirname, 'src', 'icon.png'),
     webPreferences: { nodeIntegration: false, contextIsolation: true, webSecurity: false },
     backgroundColor: '#0f172a', autoHideMenuBar: true,
