@@ -1,0 +1,45 @@
+{
+  "name": "ELAMAR – إدارة المعدات",
+  "short_name": "ELAMAR",
+  "description": "برنامج إدارة معدات بيلاميرا",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": ["window-controls-overlay", "standalone", "minimal-ui"],
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "orientation": "any",
+  "lang": "ar",
+  "dir": "rtl",
+  "categories": ["business", "productivity", "utilities"],
+  "icons": [
+    { "src": "icon-72.png",   "sizes": "72x72",   "type": "image/png" },
+    { "src": "icon-96.png",   "sizes": "96x96",   "type": "image/png" },
+    { "src": "icon-128.png",  "sizes": "128x128", "type": "image/png" },
+    { "src": "icon-144.png",  "sizes": "144x144", "type": "image/png" },
+    { "src": "icon-152.png",  "sizes": "152x152", "type": "image/png" },
+    { "src": "icon-180.png",  "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-192.png",  "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-384.png",  "sizes": "384x384", "type": "image/png" },
+    { "src": "icon-512.png",  "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    {
+      "name": "إضافة سجل",
+      "short_name": "إضافة",
+      "description": "إضافة سجل معدة جديد",
+      "url": "./index.html#add",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "السجلات",
+      "short_name": "سجلات",
+      "description": "عرض جميع السجلات",
+      "url": "./index.html#records",
+      "icons": [{ "src": "icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "screenshots": [],
+  "prefer_related_applications": false
+}

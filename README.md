@@ -1,45 +1,45 @@
-# ELAMAR – Equipment Management System
+# ELAMAR PWA – تطبيق على iPhone & Android & Laptop
 
-## المميزات / Features
-- 🌐 Arabic / English تبديل اللغة
-- 🔐 تسجيل دخول + صلاحيات 3 مستويات
-- 📊 لوحة متابعة + تقارير
-- 📋 891 سجل معدات
-- 🔄 مزامنة Google Sheets
-- 🔔 إشعارات مستخدمين جدد على Gmail
-- ☁️ Firebase Realtime Database
-
-## إعداد Firebase Rules
-```json
-{
-  "rules": {
-    "records":       { ".read": "auth != null", ".write": "auth != null" },
-    "users":         { ".read": "auth != null", ".write": "auth != null" },
-    "notifications": { ".read": "auth != null", ".write": "auth != null" }
-  }
-}
+## رابط التطبيق بعد النشر
+```
+https://mohamed-shemis.github.io/elamar-app
 ```
 
-## إعداد إشعارات Gmail (EmailJS)
-1. سجل على emailjs.com مجاناً
-2. أضف Service → Gmail
-3. أنشئ Template
-4. في src/index.html ابحث عن YOUR_EMAILJS_SERVICE وغيّر:
-   - YOUR_EMAILJS_SERVICE  → Service ID
-   - YOUR_EMAILJS_TEMPLATE → Template ID
-   - YOUR_EMAILJS_KEY      → Public Key
+## طريقة التثبيت على كل جهاز
 
-## تشغيل محلي
-```
-npm install
-npm start
-```
+### 📱 iPhone / iPad (Safari)
+1. افتح الرابط في **Safari** (مش Chrome)
+2. اضغط زرار **المشاركة** ⎙ في الأسفل
+3. اضغط **"Add to Home Screen"** / **"إضافة للشاشة الرئيسية"**
+4. اضغط **Add** ✅
+5. يظهر أيقونة ELAMAR على الشاشة الرئيسية
 
-## بناء .exe
-```
-npm install
-npm run build:win
-```
+### 🤖 Android (Chrome)
+1. افتح الرابط في **Chrome**
+2. هيظهر بانر تلقائي "ثبّت التطبيق" → اضغط **تثبيت**
+3. أو: اضغط ⋮ → **"Add to Home Screen"**
+4. يظهر أيقونة ELAMAR على الشاشة الرئيسية ✅
 
-## رفع على GitHub للبناء التلقائي
-ارفع الملفات على GitHub → Actions تبني .exe تلقائياً → Releases
+### 💻 Laptop / Desktop (Chrome / Edge)
+1. افتح الرابط في Chrome أو Edge
+2. اضغط ⊕ في شريط العنوان ← **Install**
+3. يفتح كتطبيق مستقل بدون متصفح ✅
+
+## خطوات النشر على GitHub Pages
+
+1. افتح: github.com/mohamed-shemis/elamar-app
+2. احذف الملفات القديمة وارفع ملفات هذا الـ ZIP
+3. روح **Settings** ← **Pages**
+4. اختار **Source**: Deploy from a branch
+5. اختار **Branch**: gh-pages ← Save
+6. انتظر دقيقة والرابط يظهر ✅
+
+## الملفات وما تفعله
+
+| الملف | الوظيفة |
+|-------|---------|
+| `index.html` | التطبيق الكامل |
+| `manifest.json` | بيانات التطبيق للموبايل |
+| `sw.js` | Service Worker (يعمل بدون نت) |
+| `icon-*.png` | أيقونات بأحجام مختلفة |
+| `icon-maskable.png` | أيقونة Android الكاملة |
