@@ -8,28 +8,33 @@ document.getElementById("loginBtn").onclick = async () => {
   const password = document.getElementById("password").value;
 
   try {
+    console.log("1 - trying login");
 
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    const userCred = await signInWithEmailAndPassword(auth, email, password);
 
-    // 👇 مهم جداً: نجيب role من Firestore
-    const userSnap = await getDoc(doc(db, "users", user.uid));
+    console.log("2 - login success", userCred.user.uid);
 
-    if (!userSnap.exists()) {
+    const user = userCred.user;
+
+    const ref = doc(db, "users", user.uid);
+    const snap = await getDoc(ref);
+
+    console.log("3 - firestore checked");
+
+    if (!snap.exists()) {
+      console.log("NO USER IN FIRESTORE");
       alert("User not found in database");
       return;
     }
 
-    const role = userSnap.data().role;
+    console.log("ROLE:", snap.data().role);
 
-    // نخزن role في localStorage
-    localStorage.setItem("role", role);
+    alert("LOGIN SUCCESS");
 
-    // تحويل
     window.location.href = "dashboard.html";
 
-  } catch (e) {
-    alert("Login failed");
-    console.log(e);
+  } catch (error) {
+    console.log("LOGIN ERROR:", error.message);
+    alert(error.message);
   }
 };
