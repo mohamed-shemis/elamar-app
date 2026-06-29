@@ -1,28 +1,56 @@
 {
   "name": "elamar-equipment",
   "version": "1.0.0",
-  "description": "ELAMAR – Equipment Management System",
+  "description": "ELAMAR ERP - Equipment Management System",
+  "author": "ELAMAR GROUP",
+  "license": "UNLICENSED",
+  "homepage": "./",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mohamed-shemis/elamar-app.git"
+  },
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "build:win": "electron-builder --win --x64"
+    "dev": "electron .",
+    "dist": "electron-builder",
+    "build": "electron-builder",
+    "build:win": "electron-builder --win --x64",
+    "build:portable": "electron-builder --win portable"
   },
   "build": {
-    "appId": "com.elamar.equipment",
-    "productName": "ELAMAR",
-    "directories": { "output": "dist" },
-    "files": ["main.js", "src/**/*"],
+    "appId": "com.elamar.erp",
+    "productName": "ELAMAR ERP",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "src/**/*"
+    ],
     "win": {
-      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
       "icon": "src/icon.ico"
     },
     "nsis": {
       "oneClick": false,
-      "allowToChangeInstallationDirectory": true
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "ELAMAR ERP"
     }
   },
   "devDependencies": {
-    "electron": "^28.0.0",
-    "electron-builder": "^24.0.0"
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3"
   }
 }
