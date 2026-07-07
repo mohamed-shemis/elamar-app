@@ -1,156 +1,58 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>ELAMAR ERP | Download</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
-
 <style>
-
-*{
-    margin:0;
-    padding:0;
-    box-sizing:border-box;
-    font-family:'Cairo',sans-serif;
-}
-
-body{
-    background:linear-gradient(135deg,#0d47a1,#1565c0,#1e88e5);
-    min-height:100vh;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    padding:20px;
-}
-
-.card{
-    width:500px;
-    max-width:100%;
-    background:#fff;
-    border-radius:20px;
-    padding:40px;
-    text-align:center;
-    box-shadow:0 20px 60px rgba(0,0,0,.25);
-}
-
-.logo{
-    width:120px;
-    margin-bottom:20px;
-}
-
-h1{
-    color:#1565c0;
-    font-size:36px;
-    margin-bottom:10px;
-}
-
-.version{
-    display:inline-block;
-    background:#4CAF50;
-    color:#fff;
-    padding:8px 20px;
-    border-radius:30px;
-    font-size:15px;
-    margin-bottom:20px;
-}
-
-.desc{
-    color:#666;
-    line-height:32px;
-    margin-bottom:30px;
-    font-size:18px;
-}
-
-.download{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:12px;
-    width:100%;
-    padding:18px;
-    background:linear-gradient(135deg,#1976d2,#0d47a1);
-    color:#fff;
-    text-decoration:none;
-    border-radius:12px;
-    font-size:22px;
-    font-weight:bold;
-    transition:.3s;
-    box-shadow:0 10px 25px rgba(21,101,192,.35);
-}
-
-.download:hover{
-    background:linear-gradient(135deg,#1e88e5,#1565c0);
-    transform:translateY(-4px);
-    box-shadow:0 18px 35px rgba(21,101,192,.45);
-}
-
-.download:active{
-    transform:scale(.98);
-}
-
-.info{
-    margin-top:35px;
-    text-align:right;
-}
-
-.info p{
-    margin:10px 0;
-    color:#444;
-    font-size:16px;
-}
-
-.footer{
-    margin-top:30px;
-    color:#999;
-    font-size:14px;
-}
-
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Cairo',sans-serif}
+body{background:linear-gradient(135deg,#0d47a1,#1565c0,#1e88e5);min-height:100vh;display:flex;justify-content:center;align-items:center;padding:20px}
+.card{background:#fff;max-width:520px;width:100%;padding:40px;border-radius:20px;box-shadow:0 20px 60px rgba(0,0,0,.25);text-align:center}
+.logo{width:110px;margin-bottom:20px}
+.version{display:inline-block;background:#4caf50;color:#fff;padding:8px 20px;border-radius:20px;margin:15px 0}
+.desc{color:#555;margin:20px 0;line-height:1.8}
+.download{display:block;background:#1565c0;color:#fff;text-decoration:none;padding:18px;border-radius:12px;font-size:22px;font-weight:bold}
+.download:hover{background:#0d47a1}
+.info{text-align:right;margin-top:25px;color:#444}
+.info p{margin:8px 0}
+.footer{margin-top:25px;color:#888}
 </style>
-
 </head>
-
 <body>
-
 <div class="card">
-
-<img src="icon-512.png" class="logo" alt="ELAMAR Logo">
-
+<img src="icon-512.png" class="logo" alt="ELAMAR">
 <h1>ELAMAR ERP</h1>
-
-<div class="version">
-Version 1.7
-</div>
-
-<p class="desc">
-منصة إدارة المعدات لشركة العمار.
-</p>
-
-<<a class="download"
-   href="https://github.com/mohamed-shemis/elamar-app/releases/download/latest/ELAMAR.Setup.1.0.0.exe">
-    ⬇ تحميل أحدث إصدار
-</a>
+<div class="version" id="version">جاري التحقق...</div>
+<p class="desc">منصة إدارة المعدات لشركة العمار.</p>
+<a href="#" id="downloadBtn" class="download">⬇ تحميل أحدث إصدار</a>
 <div class="info">
-
-<p>✔ نظام التشغيل: Windows 10 / 11</p>
-
-<p>✔ يتم تحميل أحدث إصدار تلقائيًا من GitHub Releases</p>
-
-<p>✔ يعمل Online & Offline</p>
-
-<p>✔ جميع التحديثات متاحة من صفحة الإصدارات</p>
-
+<p>✔ Windows 10 / 11</p>
+<p>✔ يتم جلب أحدث إصدار تلقائياً من GitHub</p>
+<p id="updated"></p>
 </div>
-
-<div class="footer">
-
-© 2026 ELAMAR ERP - جميع الحقوق محفوظة
-
+<div class="footer">© 2026 ELAMAR ERP</div>
 </div>
-
-</div>
-
-</body>
-</html>
+<script>
+const owner="mohamed-shemis";
+const repo="elamar-app";
+async function init(){
+ try{
+  const r=await fetch(`https://api.github.com/repos/${owner}/${repo}/releases/latest`);
+  const rel=await r.json();
+  document.getElementById("version").textContent=rel.tag_name;
+  document.getElementById("updated").textContent="آخر تحديث: "+new Date(rel.published_at).toLocaleDateString('ar-EG');
+  const exe=rel.assets.find(a=>a.name.toLowerCase().endsWith(".exe"));
+  if(exe){
+    document.getElementById("downloadBtn").href=exe.browser_download_url;
+  }else{
+    document.getElementById("downloadBtn").textContent="لا يوجد ملف EXE";
+  }
+ }catch(e){
+  document.getElementById("version").textContent="تعذر الاتصال بـ GitHub";
+ }
+}
+init();
+</script>
+</body></html>
