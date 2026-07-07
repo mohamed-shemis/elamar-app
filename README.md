@@ -1,45 +1,99 @@
-# ELAMAR PWA – تطبيق على iPhone & Android & Laptop
+# ELAMAR – دليل الصيانة والتطوير
 
-## رابط التطبيق بعد النشر
+## هيكل الملفات
 ```
-https://mohamed-shemis.github.io/elamar-app
+ELAMAR/
+├── src/
+│   ├── index.html    ← التطبيق الكامل (HTML + CSS + JavaScript) - كل التعليقات هنا
+│   ├── icon.png      ← أيقونة التطبيق (512×512)
+│   └── icon.ico      ← أيقونة Windows متعددة الأحجام
+├── main.js           ← نقطة دخول Electron (موثّق بالكامل)
+├── package.json      ← إعدادات البناء
+└── .github/
+    └── workflows/
+        └── build.yml ← GitHub Actions (بناء تلقائي، موثّق)
 ```
 
-## طريقة التثبيت على كل جهاز
+## أين أجد كل حاجة في index.html؟
 
-### 📱 iPhone / iPad (Safari)
-1. افتح الرابط في **Safari** (مش Chrome)
-2. اضغط زرار **المشاركة** ⎙ في الأسفل
-3. اضغط **"Add to Home Screen"** / **"إضافة للشاشة الرئيسية"**
-4. اضغط **Add** ✅
-5. يظهر أيقونة ELAMAR على الشاشة الرئيسية
+| ما أريد تعديله | ابحث (Ctrl+F) عن |
+|----------------|-------------------|
+| نصوص عربي/إنجليزي | `const TR = {` |
+| الصلاحيات (مدير/محرر/مشاهد) | `window._PERMS = {` |
+| Firebase Config | `initializeApp(` |
+| اسم تاب Google Sheet | `كارته معدات` |
+| إشعارات Gmail | `YOUR_EMAILJS_SERVICE` |
+| أنواع المصروفات | `const EXP = [` |
+| حالات المعدة | `const STATUSES = [` |
+| المواقع | `const LOCS = [` |
+| الوحدات | `const UNITS = [` |
+| عدد السجلات بالصفحة | `const PS = 30` |
+| لوحة المتابعة | `function renderD()` |
+| قائمة السجلات | `function renderL()` |
+| نموذج الإضافة | `function renderF(` |
+| التقارير | `function renderR()` |
+| إدارة المستخدمين | `function renderU()` |
 
-### 🤖 Android (Chrome)
-1. افتح الرابط في **Chrome**
-2. هيظهر بانر تلقائي "ثبّت التطبيق" → اضغط **تثبيت**
-3. أو: اضغط ⋮ → **"Add to Home Screen"**
-4. يظهر أيقونة ELAMAR على الشاشة الرئيسية ✅
+## شرح كل قسم بالملف (مرتبة بالترتيب)
 
-### 💻 Laptop / Desktop (Chrome / Edge)
-1. افتح الرابط في Chrome أو Edge
-2. اضغط ⊕ في شريط العنوان ← **Install**
-3. يفتح كتطبيق مستقل بدون متصفح ✅
+1. **HTML الأساسي** — شاشة الدخول وهيكل التطبيق
+2. **CSS** — كل الألوان والأشكال (داخل `<style>`)
+3. **قسم الصلاحيات** — `window._PERMS` يحدد من يقدر يعمل إيه
+4. **قسم اللغة** — `const TR` فيه كل النصوص عربي/إنجليزي
+5. **قسم Firebase** — الاتصال بقاعدة البيانات والمصادقة
+6. **قسم منطق التطبيق** — البيانات والدوال (renderD, renderL, إلخ)
 
-## خطوات النشر على GitHub Pages
+كل دالة في الكود فيها تعليق عربي فوقها يشرح وظيفتها بالظبط.
 
-1. افتح: github.com/mohamed-shemis/elamar-app
-2. احذف الملفات القديمة وارفع ملفات هذا الـ ZIP
-3. روح **Settings** ← **Pages**
-4. اختار **Source**: Deploy from a branch
-5. اختار **Branch**: gh-pages ← Save
-6. انتظر دقيقة والرابط يظهر ✅
+## كيفية التعديل ورفعه
 
-## الملفات وما تفعله
+### تعديل نص أو إضافة ميزة:
+1. افتح `src/index.html` بأي محرر نصوص (Notepad++ مُفضّل)
+2. اضغط Ctrl+F وابحث عن الجزء المطلوب من الجدول فوق
+3. عدّل واحفظ
+4. ارفع الملف على GitHub (نفس المكان القديم)
+5. GitHub Actions يبني .exe جديد تلقائياً خلال 5 دقائق
 
-| الملف | الوظيفة |
-|-------|---------|
-| `index.html` | التطبيق الكامل |
-| `manifest.json` | بيانات التطبيق للموبايل |
-| `sw.js` | Service Worker (يعمل بدون نت) |
-| `icon-*.png` | أيقونات بأحجام مختلفة |
-| `icon-maskable.png` | أيقونة Android الكاملة |
+### مثال: إضافة نوع مصروف جديد
+ابحث عن:
+```javascript
+const EXP=['شراء','صيانة','صيانة دورية',...];
+```
+أضف اسم النوع الجديد داخل الأقواس.
+
+### مثال: تغيير اسم تاب Google Sheet
+ابحث عن `كارته معدات` (تظهر 3 مرات) وغيّرها لاسم التاب الجديد.
+
+## Firebase Rules (مهم جداً!)
+في Firebase Console → Realtime Database → Rules، يجب أن يكون:
+```json
+{
+  "rules": {
+    "records":       { ".read": "auth != null", ".write": "auth != null" },
+    "users":         { ".read": "auth != null", ".write": "auth != null" },
+    "notifications": { ".read": "auth != null", ".write": "auth != null" }
+  }
+}
+```
+
+## تفعيل إشعارات Gmail (EmailJS):
+1. سجّل مجاناً على emailjs.com
+2. أضف Service جديد واربطه بـ Gmail
+3. أنشئ Template للإشعار
+4. في الكود ابحث عن `YOUR_EMAILJS_SERVICE` وغيّر القيم الثلاث:
+   - `YOUR_EMAILJS_SERVICE` → Service ID
+   - `YOUR_EMAILJS_TEMPLATE` → Template ID
+   - `YOUR_EMAILJS_KEY` → Public Key
+
+## تشغيل محلي للاختبار (يحتاج Node.js):
+```bash
+npm install
+npm start
+```
+
+## بناء .exe يدوياً (بدون GitHub):
+```bash
+npm install
+npm run build:win
+```
+الملف الناتج في مجلد `dist/`

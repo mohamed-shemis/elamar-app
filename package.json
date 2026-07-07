@@ -1,7 +1,7 @@
 {
   "name": "elamar-equipment",
   "version": "1.0.0",
-  "description": "ELAMAR – Equipment Management System",
+  "description": "ELAMAR – برنامج إدارة المعدات",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
