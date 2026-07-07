@@ -877,9 +877,15 @@ function renderR(){
 
 // USERS
 async function renderU(){
+  // التحقق من الصلاحية
   if(!window._can('canManageUsers')){toast('No permission','err');goto('d');return;}
+
+  // عرض الهيكل الأساسي للصفحة
   document.getElementById('pg-u').innerHTML=`<div class="fade">
-  <div style="margin-bottom:18px;"><h2 style="font-size:20px;font-weight:900;color:#f1f5f9;">${T('usersTitle')}</h2><p style="color:#64748b;font-size:12px;">${T('usersDesc')}</p></div>
+  <div style="margin-bottom:18px;">
+    <h2 style="font-size:20px;font-weight:900;color:#f1f5f9;">${T('usersTitle')}</h2>
+    <p style="color:#64748b;font-size:12px;">${T('usersDesc')}</p>
+  </div>
   <div class="card" style="padding:16px;margin-bottom:16px;">
     <div style="font-weight:800;color:#f1f5f9;font-size:13px;margin-bottom:12px;">${T('permTable')}</div>
     <div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:12px;">
@@ -890,39 +896,85 @@ async function renderU(){
         <th style="padding:8px 12px;text-align:center;color:#94a3b8;border-bottom:1px solid #334155;">${T('viewerCol')}</th>
       </tr></thead>
       <tbody>
-        ${[[T('totalRecs'),'✅','✅','✅'],[T('totalSpend'),'✅','✅','0'],[T('addBtn'),'✅','✅','❌'],[T('delOk'),'✅','❌','❌'],[T('syncBtn'),'✅','❌','❌'],[T('usersTitle'),'✅','❌','❌']].map(([p,a,e,v])=>`<tr style="border-bottom:1px solid #1e293b;"><td style="padding:8px 12px;color:#e2e8f0;">${p}</td><td style="padding:8px 12px;text-align:center;">${a}</td><td style="padding:8px 12px;text-align:center;">${e}</td><td style="padding:8px 12px;text-align:center;">${v}</td></tr>`).join('')}
+        ${[[T('totalRecs'),'✅','✅','✅'],[T('totalSpend'),'✅','✅','0'],[T('addBtn'),'✅','✅','❌'],[T('delOk'),'✅','❌','❌'],[T('syncBtn'),'✅','❌','❌'],[T('usersTitle'),'✅','❌','❌']].map(([p,a,e,v])=>`
+          <tr style="border-bottom:1px solid #1e293b;">
+            <td style="padding:8px 12px;color:#e2e8f0;">${p}</td>
+            <td style="padding:8px 12px;text-align:center;">${a}</td>
+            <td style="padding:8px 12px;text-align:center;">${e}</td>
+            <td style="padding:8px 12px;text-align:center;">${v}</td>
+          </tr>`).join('')}
       </tbody>
     </table></div>
   </div>
-  <div id="ulist" style="color:#64748b;text-align:center;padding:20px;">Loading...</div>
+  <div id="ulist" style="text-align:center;padding:30px;color:#64748b;">
+    <div style="font-size:24px;margin-bottom:8px;">⏳</div>
+    <div>جاري تحميل المستخدمين...</div>
+  </div>
   </div>`;
-  const users=await window._getUsers(),entries=Object.entries(users);
-  const RC={admin:'#f59e0b',editor:'#3b82f6',viewer:'#94a3b8'},RB={admin:'#78350f',editor:'#1e3a5f',viewer:'#1e293b'};
-  document.getElementById('ulist').innerHTML=entries.length===0?`<div style="color:#64748b;text-align:center;padding:40px;">${T('noRecs')}</div>`:
-    entries.map(([uid,u])=>`<div class="card" style="padding:18px;margin-bottom:10px;">
-      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
-        <div style="flex:1;min-width:0;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
-            <div style="width:36px;height:36px;border-radius:50%;background:${RB[u.role]||'#1e293b'};border:2px solid ${RC[u.role]||'#334155'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${u.role==='admin'?'👑':u.role==='editor'?'✏️':'👁️'}</div>
-            <div><div style="font-weight:800;color:#f1f5f9;font-size:14px;">${u.name||'—'}</div><div style="font-size:11px;color:#64748b;">${u.email||''}</div></div>
+
+  // جلب المستخدمين من Firebase
+  try {
+    const users = await window._getUsers();
+    const entries = Object.entries(users||{});
+    const ulist = document.getElementById('ulist');
+    if(!ulist) return;
+
+    // لو مفيش مستخدمين
+    if(entries.length === 0){
+      ulist.innerHTML = `<div style="color:#64748b;text-align:center;padding:40px;">لا يوجد مستخدمين</div>`;
+      return;
+    }
+
+    const RC = {admin:'#f59e0b', editor:'#3b82f6', viewer:'#94a3b8'};
+    const RB = {admin:'#78350f', editor:'#1e3a5f', viewer:'#1e293b'};
+
+    // رسم كارد لكل مستخدم
+    ulist.innerHTML = entries.map(([uid, u]) => {
+      const role  = u.role || 'viewer';
+      const bg    = RB[role] || '#1e293b';
+      const color = RC[role] || '#94a3b8';
+      const icon  = role==='admin' ? '👑' : role==='editor' ? '✏️' : '👁️';
+      const name  = (u.name||'—').replace(/'/g,'"');
+      const email = (u.email||'').replace(/'/g,'"');
+      const isMe  = uid === window._cu?.uid;
+
+      return `<div class="card" style="padding:18px;margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+              <div style="width:36px;height:36px;border-radius:50%;background:${bg};border:2px solid ${color};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">${icon}</div>
+              <div>
+                <div style="font-weight:800;color:#f1f5f9;font-size:14px;">${u.name||'—'}</div>
+                <div style="font-size:11px;color:#64748b;">${u.email||''}</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px;">
+              ${u.phone ? `<span style="font-size:11px;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:2px 8px;color:#94a3b8;">📱 ${u.phone}</span>` : ''}
+              ${u.createdAt ? `<span style="font-size:11px;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:2px 8px;color:#64748b;">📅 ${u.createdAt.slice(0,10)}</span>` : ''}
+              <span style="font-size:11px;font-weight:700;background:${bg};color:${color};border-radius:6px;padding:2px 8px;">${role}</span>
+            </div>
           </div>
-          <div style="display:flex;gap:6px;flex-wrap:wrap;">
-            ${u.phone?`<span style="font-size:11px;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:2px 8px;color:#94a3b8;">📱 ${u.phone}</span>`:''}
-            <span style="font-size:11px;background:#1e293b;border:1px solid #334155;border-radius:6px;padding:2px 8px;color:#64748b;">📅 ${(u.createdAt||'').slice(0,10)}</span>
-            <span style="font-size:11px;font-weight:700;background:${RB[u.role]};color:${RC[u.role]};border-radius:6px;padding:2px 8px;">${u.role}</span>
+          <div style="display:flex;flex-direction:column;gap:8px;min-width:200px;">
+            <label style="margin-bottom:0;">${T('changeRole')}</label>
+            <select class="field" data-uid="${uid}" data-name="${name}" onchange="changeRole(this.dataset.uid,this.value,this.dataset.name)">
+              <option value="viewer" ${role==='viewer'?'selected':''}>${T('vOpt')}</option>
+              <option value="editor" ${role==='editor'?'selected':''}>${T('eOpt')}</option>
+              <option value="admin"  ${role==='admin'?'selected':''}>${T('aOpt')}</option>
+            </select>
+            ${isMe
+              ? `<div style="font-size:11px;color:#475569;text-align:center;">${T('myAccount')}</div>`
+              : `<button data-uid="${uid}" data-name="${name}" onclick="confirmDelUser(this.dataset.uid,this.dataset.name)" style="background:#7f1d1d;border:none;border-radius:8px;padding:7px;color:#ef4444;cursor:pointer;font-family:var(--ff);font-size:12px;font-weight:700;">${T('delUser')}</button>`
+            }
           </div>
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px;min-width:200px;">
-          <label style="margin-bottom:0;">${T('changeRole')}</label>
-          <select class="field" onchange="changeRole('${uid}',this.value,'${u.name||u.email}')">
-            <option value="viewer" ${u.role==='viewer'?'selected':''}>${T('vOpt')}</option>
-            <option value="editor" ${u.role==='editor'?'selected':''}>${T('eOpt')}</option>
-            <option value="admin"  ${u.role==='admin'?'selected':''}>${T('aOpt')}</option>
-          </select>
-          ${uid!==window._cu?.uid?`<button onclick="confirmDelUser('${uid}','${u.name||u.email}')" style="background:#7f1d1d;border:none;border-radius:8px;padding:7px;color:#ef4444;cursor:pointer;font-family:var(--ff);font-size:12px;font-weight:700;">${T('delUser')}</button>`:`<div style="font-size:11px;color:#475569;text-align:center;">${T('myAccount')}</div>`}
-        </div>
-      </div>
-    </div>`).join('');
+      </div>`;
+    }).join('');
+
+  } catch(e) {
+    console.error('renderU error:', e);
+    const ulist = document.getElementById('ulist');
+    if(ulist) ulist.innerHTML = `<div style="color:#ef4444;text-align:center;padding:20px;">❌ خطأ في التحميل: ${e.message}</div>`;
+  }
 }
 async function changeRole(uid,role,name){await window._updRole(uid,role);toast(`${name} → ${role} ✓`);setTimeout(renderU,500);}
 function confirmDelUser(uid,name){if(!confirm(`Delete "${name}"?`))return;window._delUser(uid).then(()=>{toast(`Deleted ${name} ✓`);renderU();});}
