@@ -11,146 +11,111 @@
 <style>
 
 *{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Cairo',sans-serif;
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Cairo',sans-serif;
 }
 
 body{
-
-background:linear-gradient(135deg,#0d47a1,#1565c0,#1e88e5);
-
-height:100vh;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
+    background:linear-gradient(135deg,#0d47a1,#1565c0,#1e88e5);
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    padding:20px;
 }
 
 .card{
-
-width:450px;
-
-max-width:95%;
-
-background:white;
-
-border-radius:20px;
-
-padding:40px;
-
-text-align:center;
-
-box-shadow:0 20px 60px rgba(0,0,0,.25);
-
+    width:500px;
+    max-width:100%;
+    background:#fff;
+    border-radius:20px;
+    padding:40px;
+    text-align:center;
+    box-shadow:0 20px 60px rgba(0,0,0,.25);
 }
 
 .logo{
-
-width:110px;
-
-margin-bottom:20px;
-
+    width:120px;
+    margin-bottom:20px;
 }
 
 h1{
-
-font-size:34px;
-
-color:#1565c0;
-
-margin-bottom:10px;
-
+    color:#1565c0;
+    font-size:36px;
+    margin-bottom:10px;
 }
 
 .version{
-
-display:inline-block;
-
-background:#4CAF50;
-
-color:white;
-
-padding:8px 20px;
-
-border-radius:30px;
-
-margin:15px;
-
-font-size:15px;
-
+    display:inline-block;
+    background:#4CAF50;
+    color:#fff;
+    padding:8px 20px;
+    border-radius:30px;
+    font-size:15px;
+    margin-bottom:20px;
 }
 
 .desc{
-
-color:#666;
-
-line-height:30px;
-
-margin-bottom:35px;
-
+    color:#666;
+    line-height:32px;
+    margin-bottom:30px;
+    font-size:18px;
 }
 
 .download{
-
-display:block;
-
-width:100%;
-
-padding:18px;
-
-font-size:20px;
-
-background:#1565c0;
-
-color:white;
-
-text-decoration:none;
-
-border-radius:12px;
-
-transition:.3s;
-
-font-weight:bold;
-
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+    width:100%;
+    padding:18px;
+    background:linear-gradient(135deg,#1976d2,#0d47a1);
+    color:#fff;
+    text-decoration:none;
+    border-radius:12px;
+    font-size:22px;
+    font-weight:bold;
+    transition:.3s;
+    box-shadow:0 10px 25px rgba(21,101,192,.35);
 }
 
 .download:hover{
+    background:linear-gradient(135deg,#1e88e5,#1565c0);
+    transform:translateY(-4px);
+    box-shadow:0 18px 35px rgba(21,101,192,.45);
+}
 
-background:#0d47a1;
+.download:active{
+    transform:scale(.98);
+}
 
-transform:translateY(-3px);
+.icon{
+    font-size:30px;
+    animation:move 1.2s infinite;
+}
 
+@keyframes move{
+    0%,100%{transform:translateY(0);}
+    50%{transform:translateY(6px);}
 }
 
 .info{
-
-margin-top:30px;
-
-text-align:right;
-
+    margin-top:35px;
+    text-align:right;
 }
 
 .info p{
-
-margin:10px 0;
-
-color:#444;
-
+    margin:10px 0;
+    color:#444;
+    font-size:16px;
 }
 
 .footer{
-
-margin-top:25px;
-
-font-size:13px;
-
-color:#999;
-
+    margin-top:30px;
+    color:#999;
+    font-size:14px;
 }
 
 </style>
@@ -161,50 +126,46 @@ color:#999;
 
 <div class="card">
 
-<img src="icon-512.png" class="logo">
+<img src="icon-512.png" class="logo" alt="ELAMAR Logo">
 
 <h1>ELAMAR ERP</h1>
 
 <div class="version">
-
 Version 1.4
-
 </div>
 
 <p class="desc">
-
-منصة إدارة المعدات لشركه العمار.
-
+منصة إدارة المعدات لشركة العمار.
 </p>
 
 <a class="download"
-
 href="https://github.com/mohamed-shemis/elamar-app/releases/latest/download/ELAMAR-Setup.exe">
 
-⬇ تحميل أحدث إصدار
+<span class="icon">⬇</span>
+
+تحميل أحدث إصدار
 
 </a>
 
 <div class="info">
 
-<p>✔ Windows 10 / 11</p>
+<p>✔ نظام التشغيل: Windows 10 / 11</p>
 
-<p>✔ آخر تحديث تلقائياً</p>
+<p>✔ التحديثات من خلال GitHub Releases</p>
 
-<p>✔ حجم البرنامج حوالي 50 MB</p>
+<p>✔ حجم البرنامج: حوالي 50 MB</p>
 
-<p>✔ يعمل Offline & Online</p>
+<p>✔ يعمل Online & Offline</p>
 
 </div>
 
 <div class="footer">
 
-© ELAMAR ERP 2026
+© 2026 ELAMAR ERP - جميع الحقوق محفوظة
 
 </div>
 
 </div>
 
 </body>
-
 </html>
