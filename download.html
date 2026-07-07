@@ -1,214 +1,812 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>ELAMAR ERP | Download</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700&display=swap" rel="stylesheet">
-
+<title>ELAMAR ERP - Cinematic Advertisement</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <style>
-
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:'Cairo',sans-serif;
+:root{
+  --blue:#0A5FFF;--light-blue:#4D9FFF;--dark-blue:#001B3D;
+  --orange:#FF6B00;--light-orange:#FF9A40;
+  --bg:#050B1A;--card:rgba(10,30,70,0.6);--glass:rgba(255,255,255,0.06);
+  --text:#fff;--muted:rgba(255,255,255,0.55);
 }
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:'Cairo',sans-serif;color:var(--text)}
+canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 
-body{
-background:linear-gradient(135deg,#0d47a1,#1976d2,#42a5f5);
-min-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:20px;
+/* ===== شاشة البدء ===== */
+#start-screen{position:fixed;inset:0;z-index:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;background:var(--bg);transition:opacity .8s,visibility .8s}
+#start-screen.hidden{opacity:0;visibility:hidden;pointer-events:none}
+#start-screen .logo-pre{font-family:'Orbitron',sans-serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:900;letter-spacing:.12em;background:linear-gradient(135deg,var(--blue),var(--light-blue),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:.3em;text-align:center}
+#start-screen .sub-pre{font-size:clamp(.85rem,1.8vw,1.15rem);color:var(--muted);margin-bottom:2em;letter-spacing:.15em;text-align:center}
+.btns-row{display:flex;gap:1rem;align-items:center;flex-wrap:wrap;justify-content:center}
+#play-btn{width:90px;height:90px;border-radius:50%;border:2px solid var(--blue);background:rgba(10,95,255,0.12);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .3s;position:relative;flex-shrink:0}
+#play-btn::before{content:'';position:absolute;inset:-8px;border-radius:50%;border:1px solid rgba(10,95,255,0.25);animation:pulse-ring 2s infinite}
+#play-btn:hover{background:rgba(10,95,255,0.25);transform:scale(1.08);box-shadow:0 0 40px rgba(10,95,255,0.3)}
+#play-btn i{font-size:2rem;color:var(--light-blue);margin-left:4px}
+@keyframes pulse-ring{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.15);opacity:0}}
+
+#dl-btn{padding:.85em 2em;border-radius:50px;border:none;background:linear-gradient(135deg,var(--orange),var(--light-orange));color:#fff;font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.1em;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:.6em;text-decoration:none;box-shadow:0 4px 25px rgba(255,107,0,0.3);position:relative;overflow:hidden}
+#dl-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity .3s}
+#dl-btn:hover::before{opacity:1}
+#dl-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 6px 35px rgba(255,107,0,0.5)}
+#dl-btn:active{transform:scale(0.97)}
+#dl-btn i{font-size:.9rem}
+.hint-text{margin-top:1.2em;font-size:.7rem;color:rgba(255,255,255,0.25);letter-spacing:.08em;text-align:center}
+
+/* ===== حاوية السينمائي ===== */
+#cinema{position:fixed;inset:0;z-index:1;opacity:0;transition:opacity .6s}
+#cinema.active{opacity:1}
+
+/* ===== المشاهد ===== */
+.scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .9s ease;padding:2rem}
+.scene.active{opacity:1;pointer-events:auto}
+.scene-text{position:absolute;bottom:12%;left:50%;transform:translateX(-50%);text-align:center;z-index:10;width:90%;max-width:700px}
+.scene-text.ar{direction:rtl;font-family:'Cairo',sans-serif}
+.scene-text .line1{font-size:clamp(1.1rem,2.5vw,1.6rem);font-weight:700;color:var(--text);opacity:0;transform:translateY(20px);transition:all .7s ease}
+.scene-text .line2{font-size:clamp(.85rem,1.6vw,1.1rem);font-weight:400;color:var(--muted);margin-top:.4em;opacity:0;transform:translateY(20px);transition:all .7s ease .15s}
+.scene.active .scene-text .line1,.scene.active .scene-text .line2{opacity:1;transform:translateY(0)}
+.scene-text .line3{font-size:clamp(.75rem,1.3vw,.95rem);font-weight:400;color:var(--orange);margin-top:.3em;opacity:0;transform:translateY(20px);transition:all .7s ease .3s}
+.scene.active .scene-text .line3{opacity:1;transform:translateY(0)}
+
+/* ===== المشهد 1 ===== */
+#s1 .logo-main{font-family:'Orbitron',sans-serif;font-size:clamp(2rem,5vw,4rem);font-weight:900;letter-spacing:.15em;text-align:center;opacity:0;transform:scale(.7);transition:all 1s cubic-bezier(.16,1,.3,1);position:relative}
+#s1.active .logo-main{opacity:1;transform:scale(1)}
+#s1 .logo-main span{background:linear-gradient(135deg,#fff,var(--light-blue));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#s1 .logo-main::after{content:'';position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);width:60%;height:2px;background:linear-gradient(90deg,transparent,var(--orange),transparent)}
+#s1 .logo-sub{font-family:'Orbitron',sans-serif;font-size:clamp(.65rem,1.2vw,.9rem);letter-spacing:.3em;color:var(--orange);margin-top:1.2em;opacity:0;transition:opacity .8s .6s;text-align:center}
+#s1.active .logo-sub{opacity:1}
+
+/* ===== المشهد 2 ===== */
+.holo-cards{position:absolute;top:15%;left:50%;transform:translateX(-50%);display:flex;gap:1rem;z-index:5;flex-wrap:wrap;justify-content:center}
+.holo-card{background:rgba(10,95,255,0.08);border:1px solid rgba(10,95,255,0.2);backdrop-filter:blur(8px);border-radius:10px;padding:.8rem 1.2rem;min-width:140px;opacity:0;transform:translateY(15px);transition:all .6s ease}
+.scene.active .holo-card{opacity:1;transform:translateY(0)}
+.scene.active .holo-card:nth-child(2){transition-delay:.15s}
+.scene.active .holo-card:nth-child(3){transition-delay:.3s}
+.holo-card .hc-label{font-size:.65rem;color:var(--light-blue);letter-spacing:.08em;margin-bottom:.3rem}
+.holo-card .hc-value{font-family:'Orbitron',sans-serif;font-size:1.1rem;font-weight:700;color:var(--text)}
+.holo-card .hc-bar{height:3px;background:rgba(255,255,255,0.1);border-radius:2px;margin-top:.4rem;overflow:hidden}
+.holo-card .hc-bar-fill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--blue),var(--orange));transition:width 1.5s ease .5s;width:0}
+.scene.active .holo-card .hc-bar-fill{width:var(--fill)}
+
+/* ===== المشهد 3 ===== */
+.dash-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:min(90%,700px);z-index:5}
+.dash-card{background:var(--glass);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:1.2rem;backdrop-filter:blur(12px);opacity:0;transform:scale(.85);transition:all .5s ease;display:flex;align-items:center;gap:.8rem}
+.scene.active .dash-card{opacity:1;transform:scale(1)}
+.scene.active .dash-card:nth-child(1){transition-delay:.1s}
+.scene.active .dash-card:nth-child(2){transition-delay:.2s}
+.scene.active .dash-card:nth-child(3){transition-delay:.3s}
+.scene.active .dash-card:nth-child(4){transition-delay:.4s}
+.scene.active .dash-card:nth-child(5){transition-delay:.5s}
+.scene.active .dash-card:nth-child(6){transition-delay:.6s}
+.dash-card .dc-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+.dash-card:nth-child(1) .dc-icon{background:rgba(10,95,255,0.15);color:var(--light-blue)}
+.dash-card:nth-child(2) .dc-icon{background:rgba(255,107,0,0.15);color:var(--orange)}
+.dash-card:nth-child(3) .dc-icon{background:rgba(0,200,150,0.15);color:#00C896}
+.dash-card:nth-child(4) .dc-icon{background:rgba(160,80,255,0.15);color:#A050FF}
+.dash-card:nth-child(5) .dc-icon{background:rgba(255,200,0,0.15);color:#FFC800}
+.dash-card:nth-child(6) .dc-icon{background:rgba(255,80,120,0.15);color:#FF5078}
+.dash-card .dc-name{font-size:.8rem;font-weight:600;color:var(--text)}
+.dash-card .dc-count{font-family:'Orbitron',sans-serif;font-size:.7rem;color:var(--muted);margin-top:.15rem}
+
+/* ===== المشهد 4 ===== */
+.office-frame{position:absolute;top:50%;left:50%;transform:translate(-50%,-55%);width:min(85%,550px);z-index:5}
+.laptop-screen{background:rgba(5,15,40,0.9);border:2px solid rgba(10,95,255,0.3);border-radius:10px;padding:1.2rem;position:relative;overflow:hidden}
+.ls-dots{display:flex;gap:5px;position:absolute;top:8px;left:10px}
+.ls-dots span{width:7px;height:7px;border-radius:50%}
+.ls-dots span:nth-child(1){background:#FF5078}
+.ls-dots span:nth-child(2){background:#FFC800}
+.ls-dots span:nth-child(3){background:#00C896}
+.ls-row{display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:1px solid rgba(255,255,255,0.04);opacity:0;transform:translateX(-10px);transition:all .5s ease}
+.scene.active .ls-row{opacity:1;transform:translateX(0)}
+.scene.active .ls-row:nth-child(2){transition-delay:.3s}
+.scene.active .ls-row:nth-child(3){transition-delay:.5s}
+.scene.active .ls-row:nth-child(4){transition-delay:.7s}
+.scene.active .ls-row:nth-child(5){transition-delay:.9s}
+.ls-row .lsr-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ls-row .lsr-text{font-size:.78rem;color:var(--text)}
+.ls-row .lsr-status{margin-left:auto;font-size:.65rem;padding:.15rem .5rem;border-radius:4px}
+.laptop-base{height:8px;background:linear-gradient(180deg,rgba(10,95,255,0.2),rgba(10,95,255,0.05));border-radius:0 0 4px 4px;margin-top:2px}
+
+/* ===== المشهد 5 ===== */
+.ai-data-cards{position:absolute;z-index:5;display:flex;flex-direction:column;gap:.6rem}
+.ai-data-cards.left{left:8%;top:25%}
+.ai-data-cards.right{right:8%;top:30%}
+.ai-dc{background:rgba(0,200,150,0.06);border:1px solid rgba(0,200,150,0.15);border-radius:8px;padding:.6rem .9rem;opacity:0;transition:all .5s ease;min-width:150px}
+.scene.active .ai-dc{opacity:1}
+.ai-data-cards.left .ai-dc:nth-child(1){transition-delay:.3s}
+.ai-data-cards.left .ai-dc:nth-child(2){transition-delay:.5s}
+.ai-data-cards.left .ai-dc:nth-child(3){transition-delay:.7s}
+.ai-data-cards.right .ai-dc:nth-child(1){transition-delay:.4s}
+.ai-data-cards.right .ai-dc:nth-child(2){transition-delay:.6s}
+.ai-dc .aidc-label{font-size:.6rem;color:rgba(0,200,150,0.7);letter-spacing:.06em}
+.ai-dc .aidc-val{font-family:'Orbitron',sans-serif;font-size:.85rem;font-weight:600;color:var(--text);margin-top:.2rem}
+.ai-dc .aidc-status{display:inline-block;font-size:.6rem;padding:.1rem .4rem;border-radius:3px;margin-top:.3rem}
+.status-ok{background:rgba(0,200,150,0.15);color:#00C896}
+.status-warn{background:rgba(255,200,0,0.15);color:#FFC800}
+
+/* ===== المشهد 6 ===== */
+.shield-icon{position:absolute;top:8%;left:50%;transform:translateX(-50%);font-size:2rem;color:var(--blue);opacity:0;transition:all .6s .3s;filter:drop-shadow(0 0 15px rgba(10,95,255,0.4))}
+.scene.active .shield-icon{opacity:1}
+.net-label{position:absolute;font-size:.7rem;color:var(--light-blue);background:rgba(10,95,255,0.1);border:1px solid rgba(10,95,255,0.2);border-radius:6px;padding:.3rem .6rem;opacity:0;transition:all .5s ease;white-space:nowrap;z-index:5}
+.scene.active .net-label{opacity:1}
+.net-label:nth-child(1){top:20%;left:15%;transition-delay:.2s}
+.net-label:nth-child(2){top:15%;right:15%;transition-delay:.3s}
+.net-label:nth-child(3){top:50%;left:10%;transition-delay:.4s}
+.net-label:nth-child(4){top:45%;right:10%;transition-delay:.5s}
+.net-label:nth-child(5){bottom:25%;left:25%;transition-delay:.6s}
+.net-label:nth-child(6){bottom:20%;right:25%;transition-delay:.7s}
+
+/* ===== المشهد 7 ===== */
+.devices-row{display:flex;align-items:flex-end;gap:2rem;z-index:5;position:relative}
+.device-frame{opacity:0;transform:translateY(20px);transition:all .6s ease}
+.scene.active .device-frame{opacity:1;transform:translateY(0)}
+.scene.active .device-frame:nth-child(2){transition-delay:.15s}
+.scene.active .device-frame:nth-child(3){transition-delay:.3s}
+.device-laptop{width:180px;height:115px;background:rgba(10,30,70,0.8);border:1.5px solid rgba(10,95,255,0.25);border-radius:6px 6px 0 0;position:relative;overflow:hidden}
+.device-laptop .dl-screen{position:absolute;inset:3px;background:linear-gradient(135deg,rgba(10,95,255,0.1),rgba(10,30,70,0.5));border-radius:4px;display:flex;align-items:center;justify-content:center}
+.device-laptop .dl-screen span{font-family:'Orbitron',sans-serif;font-size:.55rem;color:var(--light-blue);letter-spacing:.1em}
+.device-laptop::after{content:'';position:absolute;bottom:-8px;left:-5px;right:-5px;height:8px;background:rgba(10,95,255,0.15);border-radius:0 0 4px 4px}
+.device-tablet{width:120px;height:160px;background:rgba(10,30,70,0.8);border:1.5px solid rgba(10,95,255,0.25);border-radius:8px;position:relative;overflow:hidden}
+.device-tablet .dt-screen{position:absolute;inset:4px;background:linear-gradient(135deg,rgba(10,95,255,0.1),rgba(10,30,70,0.5));border-radius:5px;display:flex;align-items:center;justify-content:center}
+.device-tablet .dt-screen span{font-family:'Orbitron',sans-serif;font-size:.45rem;color:var(--light-blue);letter-spacing:.08em}
+.device-phone{width:65px;height:120px;background:rgba(10,30,70,0.8);border:1.5px solid rgba(10,95,255,0.25);border-radius:10px;position:relative;overflow:hidden}
+.device-phone .dp-screen{position:absolute;inset:3px;top:10px;bottom:10px;background:linear-gradient(135deg,rgba(10,95,255,0.1),rgba(10,30,70,0.5));border-radius:6px;display:flex;align-items:center;justify-content:center}
+.device-phone .dp-screen span{font-family:'Orbitron',sans-serif;font-size:.3rem;color:var(--light-blue);letter-spacing:.05em}
+.device-phone::before{content:'';position:absolute;top:3px;left:50%;transform:translateX(-50%);width:20px;height:3px;background:rgba(255,255,255,0.1);border-radius:2px}
+.sync-arrows{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:4;opacity:0;transition:opacity .5s .5s}
+.scene.active .sync-arrows{opacity:1}
+.sync-arrows i{color:var(--orange);font-size:1.5rem;animation:sync-pulse 1.5s infinite}
+@keyframes sync-pulse{0%,100%{opacity:.3;transform:scale(.9)}50%{opacity:1;transform:scale(1.1)}}
+.cloud-icon{position:absolute;top:15%;left:50%;transform:translateX(-50%);z-index:4;opacity:0;transition:opacity .5s .3s}
+.scene.active .cloud-icon{opacity:1}
+.cloud-icon i{font-size:2.5rem;color:rgba(10,95,255,0.4);filter:drop-shadow(0 0 10px rgba(10,95,255,0.3))}
+
+/* ===== المشهد 8 ===== */
+#s8 .final-logo{font-family:'Orbitron',sans-serif;font-size:clamp(2.5rem,6vw,5rem);font-weight:900;letter-spacing:.15em;text-align:center;opacity:0;transform:scale(.8);transition:all 1s cubic-bezier(.16,1,.3,1);position:relative;z-index:5}
+#s8.active .final-logo{opacity:1;transform:scale(1)}
+#s8 .final-logo span{background:linear-gradient(135deg,#fff 30%,var(--light-blue) 70%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+#s8 .final-sub{font-size:clamp(1rem,2vw,1.4rem);font-weight:700;color:var(--text);margin-top:.8em;text-align:center;opacity:0;transition:opacity .7s .5s;z-index:5;position:relative}
+#s8.active .final-sub{opacity:1}
+.cta-btn{display:inline-flex;align-items:center;gap:.6em;margin-top:1.5em;padding:.9em 2.5em;background:linear-gradient(135deg,var(--orange),var(--light-orange));color:#fff;font-family:'Orbitron',sans-serif;font-size:clamp(.8rem,1.4vw,1rem);font-weight:700;letter-spacing:.12em;border:none;border-radius:50px;cursor:pointer;text-decoration:none;opacity:0;transform:translateY(15px);transition:all .6s .8s;position:relative;z-index:5;box-shadow:0 4px 30px rgba(255,107,0,0.3)}
+.cta-btn.active-show{opacity:1;transform:translateY(0)}
+.cta-btn:hover{transform:translateY(-2px) scale(1.04)!important;box-shadow:0 6px 40px rgba(255,107,0,0.5)}
+#s8 .final-url{font-size:clamp(.6rem,1vw,.78rem);color:var(--muted);margin-top:1em;text-align:center;opacity:0;transition:opacity .5s 1.1s;z-index:5;position:relative;direction:ltr;font-family:'Orbitron',sans-serif;letter-spacing:.05em}
+#s8.active .final-url{opacity:1}
+#s8 .glow-orb{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(10,95,255,0.15),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;animation:orb-breathe 3s infinite ease-in-out}
+@keyframes orb-breathe{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.3);opacity:1}}
+
+/* ===== شريط التقدم ===== */
+#progress-wrap{position:fixed;bottom:0;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);z-index:100;cursor:pointer}
+#progress-bar{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--orange));transition:width .1s linear;border-radius:0 2px 2px 0;position:relative}
+#progress-bar::after{content:'';position:absolute;right:-3px;top:-3px;width:10px;height:10px;background:var(--orange);border-radius:50%;box-shadow:0 0 10px rgba(255,107,0,0.5);opacity:0;transition:opacity .2s}
+#progress-wrap:hover #progress-bar::after{opacity:1}
+
+/* ===== أزرار التحكم ===== */
+#controls{position:fixed;bottom:16px;right:20px;display:flex;gap:10px;z-index:100;opacity:0;transition:opacity .4s}
+#cinema.active #controls{opacity:1}
+#controls button{width:36px;height:36px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);background:rgba(10,20,50,0.7);color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:.8rem;transition:all .2s;backdrop-filter:blur(8px)}
+#controls button:hover{border-color:var(--blue);color:var(--light-blue);background:rgba(10,95,255,0.1)}
+#time-display{position:fixed;bottom:18px;left:20px;font-family:'Orbitron',sans-serif;font-size:.65rem;color:var(--muted);z-index:100;opacity:0;transition:opacity .4s;letter-spacing:.08em}
+#cinema.active #time-display{opacity:1}
+
+@media(max-width:640px){
+  .dash-grid{grid-template-columns:repeat(2,1fr);gap:.6rem;padding:0 .5rem}
+  .devices-row{gap:1rem;transform:scale(.8)}
+  .device-laptop{width:140px;height:90px}
+  .device-tablet{width:95px;height:130px}
+  .device-phone{width:52px;height:95px}
+  .holo-cards{flex-direction:column;align-items:center}
+  .ai-data-cards{display:none}
+  .office-frame{width:95%}
+  .net-label{font-size:.55rem;padding:.2rem .4rem}
+  #dl-btn{padding:.7em 1.4em;font-size:.65rem}
 }
-
-.card{
-width:520px;
-max-width:100%;
-background:#fff;
-border-radius:22px;
-padding:40px;
-text-align:center;
-box-shadow:0 20px 60px rgba(0,0,0,.25);
+@media(prefers-reduced-motion:reduce){
+  *{animation-duration:0s!important;transition-duration:0.3s!important}
 }
-
-.logo{
-width:120px;
-margin-bottom:20px;
-}
-
-h1{
-font-size:38px;
-color:#1565c0;
-margin-bottom:10px;
-}
-
-.version{
-display:inline-block;
-background:#4CAF50;
-color:#fff;
-padding:8px 22px;
-border-radius:30px;
-font-size:15px;
-margin:20px 0;
-}
-
-.desc{
-font-size:18px;
-color:#555;
-line-height:32px;
-margin-bottom:25px;
-}
-
-.download{
-display:flex;
-justify-content:center;
-align-items:center;
-gap:10px;
-width:100%;
-padding:20px;
-background:#ff9800;
-color:#fff;
-text-decoration:none;
-font-size:24px;
-font-weight:bold;
-border-radius:12px;
-transition:.3s;
-}
-
-.download:hover{
-background:#f57c00;
-transform:translateY(-3px);
-}
-
-.info{
-margin-top:35px;
-text-align:right;
-}
-
-.info p{
-margin:10px 0;
-font-size:16px;
-color:#444;
-}
-
-.footer{
-margin-top:30px;
-font-size:14px;
-color:#888;
-}
-
-.loading{
-color:#1565c0;
-font-weight:bold;
-margin-top:15px;
-}
-
 </style>
-
 </head>
-
 <body>
 
-<div class="card">
-
-<img src="icon-512.png" class="logo">
-
-<h1>ELAMAR ERP</h1>
-
-<div class="version" id="version">
-Loading...
+<!-- شاشة البدء -->
+<div id="start-screen">
+  <div class="logo-pre">ELAMAR ERP</div>
+  <div class="sub-pre">SMART EQUIPMENT MANAGEMENT SYSTEM</div>
+  <div class="btns-row">
+    <button id="play-btn" aria-label="تشغيل الإعلان"><i class="fas fa-play"></i></button>
+    <a id="dl-btn" href="https://mohamed-shemis.github.io/elamar-app/download.html" target="_blank" aria-label="تحميل البرنامج"><i class="fas fa-download"></i> DOWNLOAD NOW</a>
+  </div>
+  <div class="hint-text">SPACE = Play/Pause &nbsp;&bull;&nbsp; M = Sound &nbsp;&bull;&nbsp; R = Restart</div>
 </div>
 
-<p class="desc">
-منصة إدارة المعدات لشركة العمار
-</p>
+<!-- الحاوية السينمائية -->
+<div id="cinema">
+  <canvas id="bg"></canvas>
 
-<a id="downloadBtn" class="download" href="#">
-⬇ تحميل أحدث إصدار
-</a>
+  <div class="scene" id="s1">
+    <div class="logo-main"><span>ELAMAR ERP</span></div>
+    <div class="logo-sub">SMART EQUIPMENT MANAGEMENT SYSTEM</div>
+  </div>
 
-<div class="loading" id="status">
-جارٍ البحث عن أحدث إصدار...
-</div>
+  <div class="scene" id="s2">
+    <div class="holo-cards">
+      <div class="holo-card"><div class="hc-label">ACTIVE MACHINES</div><div class="hc-value">24</div><div class="hc-bar"><div class="hc-bar-fill" style="--fill:85%"></div></div></div>
+      <div class="holo-card"><div class="hc-label">OPERATING HOURS</div><div class="hc-value">1,847h</div><div class="hc-bar"><div class="hc-bar-fill" style="--fill:72%"></div></div></div>
+      <div class="holo-card"><div class="hc-label">EFFICIENCY</div><div class="hc-value">94.2%</div><div class="hc-bar"><div class="hc-bar-fill" style="--fill:94%"></div></div></div>
+    </div>
+    <div class="scene-text ar">
+      <div class="line1">إدارة جميع معدات شركتك</div>
+      <div class="line2">من منصة واحدة</div>
+    </div>
+  </div>
 
-<div class="info">
+  <div class="scene" id="s3">
+    <div class="dash-grid">
+      <div class="dash-card"><div class="dc-icon"><i class="fas fa-cogs"></i></div><div><div class="dc-name">Equipment Mgmt</div><div class="dc-count">142 Units</div></div></div>
+      <div class="dash-card"><div class="dc-icon"><i class="fas fa-tools"></i></div><div><div class="dc-name">Maintenance</div><div class="dc-count">38 Tasks</div></div></div>
+      <div class="dash-card"><div class="dc-icon"><i class="fas fa-project-diagram"></i></div><div><div class="dc-name">Projects</div><div class="dc-count">12 Active</div></div></div>
+      <div class="dash-card"><div class="dc-icon"><i class="fas fa-chart-bar"></i></div><div><div class="dc-name">Reports</div><div class="dc-count">256 Generated</div></div></div>
+      <div class="dash-card"><div class="dc-icon"><i class="fas fa-chart-line"></i></div><div><div class="dc-name">Analytics</div><div class="dc-count">Live Data</div></div></div>
+      <div class="dash-card"><div class="dc-icon"><i class="fas fa-users-cog"></i></div><div><div class="dc-name">Users</div><div class="dc-count">54 Members</div></div></div>
+    </div>
+    <div class="scene-text ar">
+      <div class="line1">Dashboard ذكي</div>
+      <div class="line2">بيانات دقيقة - قرارات أسرع</div>
+    </div>
+  </div>
 
-<p>✔ Windows 10 / Windows 11</p>
+  <div class="scene" id="s4">
+    <div class="office-frame">
+      <div class="laptop-screen">
+        <div class="ls-dots"><span></span><span></span><span></span></div>
+        <div style="height:30px"></div>
+        <div class="ls-row"><div class="lsr-dot" style="background:var(--light-blue)"></div><div class="lsr-text">Excavator CAT-320 - Active</div><div class="lsr-status" style="background:rgba(0,200,150,0.15);color:#00C896">Online</div></div>
+        <div class="ls-row"><div class="lsr-dot" style="background:var(--orange)"></div><div class="lsr-text">Crane T-500 - Maintenance</div><div class="lsr-status" style="background:rgba(255,200,0,0.15);color:#FFC800">Service</div></div>
+        <div class="ls-row"><div class="lsr-dot" style="background:var(--light-blue)"></div><div class="lsr-text">Loader WA-380 - Active</div><div class="lsr-status" style="background:rgba(0,200,150,0.15);color:#00C896">Online</div></div>
+        <div class="ls-row"><div class="lsr-dot" style="background:#FF5078"></div><div class="lsr-text">Truck D-400 - Offline</div><div class="lsr-status" style="background:rgba(255,80,120,0.15);color:#FF5078">Offline</div></div>
+      </div>
+      <div class="laptop-base"></div>
+    </div>
+    <div class="scene-text ar">
+      <div class="line1">متابعة المعدات</div>
+      <div class="line2">في أي وقت ومن أي مكان</div>
+    </div>
+  </div>
 
-<p>✔ Online & Offline</p>
+  <div class="scene" id="s5">
+    <div class="ai-data-cards left">
+      <div class="ai-dc"><div class="aidc-label">NEXT SERVICE</div><div class="aidc-val">120 Hours</div><div class="aidc-status status-ok">On Schedule</div></div>
+      <div class="ai-dc"><div class="aidc-label">ENGINE TEMP</div><div class="aidc-val">87.3 C</div><div class="aidc-status status-ok">Normal</div></div>
+      <div class="ai-dc"><div class="aidc-label">HYDRAULIC PRESSURE</div><div class="aidc-val">3,200 PSI</div><div class="aidc-status status-warn">Monitor</div></div>
+    </div>
+    <div class="ai-data-cards right">
+      <div class="ai-dc"><div class="aidc-label">SERVICE HISTORY</div><div class="aidc-val">47 Records</div></div>
+      <div class="ai-dc"><div class="aidc-label">AVAILABILITY</div><div class="aidc-val">96.8%</div><div class="aidc-status status-ok">Excellent</div></div>
+    </div>
+    <div class="scene-text ar">
+      <div class="line1">صيانة استباقية</div>
+      <div class="line2">تقليل الأعطال وزيادة الإنتاجية</div>
+    </div>
+  </div>
 
-<p>✔ تحديثات تلقائية من GitHub Releases</p>
+  <div class="scene" id="s6">
+    <div class="shield-icon"><i class="fas fa-shield-halved"></i></div>
+    <div class="net-label"><i class="fas fa-building" style="margin-left:.4em;color:var(--orange)"></i>Company A</div>
+    <div class="net-label"><i class="fas fa-building" style="margin-left:.4em;color:var(--orange)"></i>Company B</div>
+    <div class="net-label"><i class="fas fa-user-tie" style="margin-left:.4em;color:var(--light-blue)"></i>Admin</div>
+    <div class="net-label"><i class="fas fa-user" style="margin-left:.4em;color:var(--light-blue)"></i>Manager</div>
+    <div class="net-label"><i class="fas fa-user" style="margin-left:.4em;color:var(--light-blue)"></i>Engineer</div>
+    <div class="net-label"><i class="fas fa-lock" style="margin-left:.4em;color:#00C896"></i>Encrypted</div>
+    <div class="scene-text ar">
+      <div class="line1">صلاحيات متعددة</div>
+      <div class="line2">Multi Company</div>
+      <div class="line3">أمان كامل</div>
+    </div>
+  </div>
 
-<p>✔ تحميل آخر إصدار دائماً</p>
+  <div class="scene" id="s7">
+    <div class="cloud-icon"><i class="fas fa-cloud"></i></div>
+    <div class="devices-row">
+      <div class="device-frame"><div class="device-laptop"><div class="dl-screen"><span>ELAMAR</span></div></div></div>
+      <div class="sync-arrows"><i class="fas fa-arrows-rotate"></i></div>
+      <div class="device-frame"><div class="device-tablet"><div class="dt-screen"><span>ELAMAR</span></div></div></div>
+      <div class="sync-arrows"><i class="fas fa-arrows-rotate"></i></div>
+      <div class="device-frame"><div class="device-phone"><div class="dp-screen"><span>ELAMAR</span></div></div></div>
+    </div>
+    <div class="scene-text ar">
+      <div class="line1">Online &amp; Offline</div>
+      <div class="line2">يعمل معك دائماً</div>
+    </div>
+  </div>
 
-</div>
+  <div class="scene" id="s8">
+    <div class="glow-orb"></div>
+    <div class="final-logo"><span>ELAMAR ERP</span></div>
+    <div class="final-sub">نظام إدارة المعدات الذكي</div>
+    <a href="https://mohamed-shemis.github.io/elamar-app/download.html" target="_blank" class="cta-btn"><i class="fas fa-download"></i> DOWNLOAD NOW</a>
+    <div class="final-url">mohamed-shemis.github.io/elamar-app/download.html</div>
+  </div>
 
-<div class="footer">
-© 2026 ELAMAR ERP
-</div>
-
+  <div id="progress-wrap"><div id="progress-bar"></div></div>
+  <div id="controls">
+    <button id="btn-sound" aria-label="الصوت"><i class="fas fa-volume-xmark"></i></button>
+    <button id="btn-restart" aria-label="إعادة"><i class="fas fa-rotate-right"></i></button>
+    <button id="btn-pause" aria-label="إيقاف مؤقت"><i class="fas fa-pause"></i></button>
+  </div>
+  <div id="time-display">00:00 / 01:00</div>
 </div>
 
 <script>
+/* ====================================================
+   ELAMAR ERP - محرك الإعلان السينمائي
+   ==================================================== */
 
-async function loadLatestRelease(){
+const SCENES = [
+  { id:'s1', start:0,  end:5  },
+  { id:'s2', start:5,  end:12 },
+  { id:'s3', start:12, end:20 },
+  { id:'s4', start:20, end:28 },
+  { id:'s5', start:28, end:36 },
+  { id:'s6', start:36, end:44 },
+  { id:'s7', start:44, end:50 },
+  { id:'s8', start:50, end:60 }
+];
+const TOTAL_DUR = 60;
+const DOWNLOAD_URL = 'https://mohamed-shemis.github.io/elamar-app/download.html';
 
-const owner="mohamed-shemis";
-const repo="elamar-app";
+const canvas = document.getElementById('bg');
+const ctx = canvas.getContext('2d');
+const startScreen = document.getElementById('start-screen');
+const cinema = document.getElementById('cinema');
+const progressBar = document.getElementById('progress-bar');
+const progressWrap = document.getElementById('progress-wrap');
+const timeDisplay = document.getElementById('time-display');
+const btnPause = document.getElementById('btn-pause');
+const btnRestart = document.getElementById('btn-restart');
+const btnSound = document.getElementById('btn-sound');
+const sceneEls = SCENES.map(s => document.getElementById(s.id));
+const ctaBtns = document.querySelectorAll('.cta-btn');
 
-try{
+let W, H, playing = false, currentTime = 0, lastFrame = 0;
+let currentSceneIdx = -1, soundOn = false;
+let particles = [], scanAngle = 0, netNodes = [];
 
-const response=await fetch(
-`https://api.github.com/repos/${owner}/${repo}/releases/latest`
-);
+function resize() {
+  W = canvas.width = window.innerWidth;
+  H = canvas.height = window.innerHeight;
+}
+window.addEventListener('resize', resize);
+resize();
 
-const release=await response.json();
-
-document.getElementById("version").innerHTML=release.tag_name;
-
-const exe=release.assets.find(asset=>
-asset.name.toLowerCase().endsWith(".exe")
-);
-
-if(exe){
-
-document.getElementById("downloadBtn").href=
-exe.browser_download_url;
-
-document.getElementById("downloadBtn").target="_blank";
-
-document.getElementById("status").innerHTML=
-"جاهز للتحميل ✔";
-
-}else{
-
-document.getElementById("status").innerHTML=
-"لم يتم العثور على ملف EXE";
-
-document.getElementById("downloadBtn").style.display="none";
-
+// ===== الجسيمات =====
+class Particle {
+  constructor(type) { this.reset(type); }
+  reset(type) {
+    this.type = type || 'blue';
+    this.x = Math.random() * W;
+    this.y = Math.random() * H;
+    this.size = Math.random() * 2.5 + 0.5;
+    this.speedX = (Math.random() - 0.5) * 0.4;
+    this.speedY = (Math.random() - 0.5) * 0.3 - 0.1;
+    this.life = 1;
+    this.decay = Math.random() * 0.003 + 0.001;
+    const colors = {
+      blue:  [10,95,255], orange: [255,107,0],
+      white: [200,220,255], green: [0,200,150]
+    };
+    const c = colors[this.type] || colors.blue;
+    this.r = c[0]; this.g = c[1]; this.b = c[2];
+  }
+  update() {
+    this.x += this.speedX; this.y += this.speedY; this.life -= this.decay;
+    if (this.life <= 0 || this.x < -10 || this.x > W+10 || this.y < -10 || this.y > H+10) this.reset(this.type);
+  }
+  draw(c) {
+    c.save();
+    c.globalAlpha = this.life * 0.6;
+    c.fillStyle = `rgba(${this.r},${this.g},${this.b},1)`;
+    c.shadowColor = `rgba(${this.r},${this.g},${this.b},0.8)`;
+    c.shadowBlur = 8;
+    c.beginPath();
+    c.arc(this.x, this.y, Math.max(0.1, this.size), 0, Math.PI * 2);
+    c.fill();
+    c.restore();
+  }
 }
 
-}catch(e){
+function initParticles(count, type) {
+  particles = [];
+  for (let i = 0; i < count; i++) particles.push(new Particle(type));
+}
+initParticles(120, 'blue');
 
-document.getElementById("status").innerHTML=
-"حدث خطأ أثناء الاتصال بـ GitHub";
-
-console.log(e);
-
+// ===== رسم الآلات =====
+function drawExcavator(c, x, y, s, glow) {
+  c.save(); c.translate(x, y); c.scale(s, s);
+  c.fillStyle = 'rgba(3,8,20,0.9)';
+  c.shadowColor = glow || 'rgba(10,95,255,0.3)'; c.shadowBlur = 15;
+  c.fillRect(-45, -12, 90, 22);
+  c.fillRect(-25, -45, 35, 35);
+  c.beginPath(); c.moveTo(10,-35); c.lineTo(55,-70); c.lineTo(65,-58); c.lineTo(20,-23); c.closePath(); c.fill();
+  c.beginPath(); c.moveTo(55,-70); c.lineTo(78,-62); c.lineTo(75,-50); c.lineTo(55,-58); c.closePath(); c.fill();
+  c.restore();
+}
+function drawCrane(c, x, y, s, glow) {
+  c.save(); c.translate(x, y); c.scale(s, s);
+  c.fillStyle = 'rgba(3,8,20,0.9)';
+  c.shadowColor = glow || 'rgba(10,95,255,0.3)'; c.shadowBlur = 12;
+  c.fillRect(-25, -12, 50, 22);
+  c.fillRect(-6, -220, 12, 220);
+  c.fillRect(-6, -220, 170, 8);
+  c.fillRect(-90, -220, 90, 8);
+  c.strokeStyle = 'rgba(3,8,20,0.7)'; c.lineWidth = 1.5;
+  c.beginPath(); c.moveTo(120,-212); c.lineTo(120,-110); c.stroke();
+  c.fillRect(110,-110,20,15);
+  c.restore();
+}
+function drawTruck(c, x, y, s, glow) {
+  c.save(); c.translate(x, y); c.scale(s, s);
+  c.fillStyle = 'rgba(3,8,20,0.9)';
+  c.shadowColor = glow || 'rgba(10,95,255,0.3)'; c.shadowBlur = 12;
+  c.fillRect(-50, -30, 30, 28);
+  c.beginPath(); c.moveTo(-20,-32); c.lineTo(55,-38); c.lineTo(55,-5); c.lineTo(-20,-5); c.closePath(); c.fill();
+  c.fillStyle = 'rgba(0,0,0,0.8)';
+  c.beginPath(); c.arc(-35,5,8,0,Math.PI*2); c.fill();
+  c.beginPath(); c.arc(40,5,8,0,Math.PI*2); c.fill();
+  c.restore();
+}
+function drawLoader(c, x, y, s, glow) {
+  c.save(); c.translate(x, y); c.scale(s, s);
+  c.fillStyle = 'rgba(3,8,20,0.9)';
+  c.shadowColor = glow || 'rgba(10,95,255,0.3)'; c.shadowBlur = 12;
+  c.fillRect(-35,-20,70,30);
+  c.fillRect(-30,-42,30,24);
+  c.fillRect(15,-50,8,-30);
+  c.fillRect(30,-50,8,-30);
+  c.fillRect(10,-85,35,10);
+  c.restore();
 }
 
+// ===== شبكة منظورية (مشهد 2) =====
+function drawPerspectiveGrid(c, t) {
+  c.save();
+  c.strokeStyle = 'rgba(10,95,255,0.08)'; c.lineWidth = 1;
+  const cx = W/2, cy = H*0.35;
+  for (let i = 0; i < 20; i++) {
+    const a = (i/20)*Math.PI*2;
+    c.beginPath(); c.moveTo(cx,cy); c.lineTo(cx+Math.cos(a)*W, cy+Math.sin(a)*H); c.stroke();
+  }
+  for (let r = 50; r < Math.max(W,H); r += 80) {
+    c.beginPath(); c.arc(cx,cy,r,0,Math.PI*2); c.stroke();
+  }
+  const dots = [
+    {a:.3,d:200,s:.0003},{a:1.2,d:280,s:-.0002},{a:2.5,d:180,s:.0004},
+    {a:3.8,d:320,s:-.0003},{a:4.5,d:250,s:.00025},{a:5.5,d:350,s:-.00015}
+  ];
+  dots.forEach(md => {
+    const a = md.a + t*md.s*Math.PI*2;
+    const mx = cx+Math.cos(a)*md.d, my = cy+Math.sin(a)*md.d;
+    c.fillStyle='rgba(10,95,255,0.6)'; c.shadowColor='rgba(10,95,255,0.8)'; c.shadowBlur=10;
+    c.beginPath(); c.arc(mx,my,4,0,Math.PI*2); c.fill();
+    c.strokeStyle='rgba(10,95,255,0.2)'; c.shadowBlur=0; c.lineWidth=1;
+    const p=(Math.sin(t*.003+md.a)+1)*8+4;
+    c.beginPath(); c.arc(mx,my,p,0,Math.PI*2); c.stroke();
+  });
+  c.restore();
 }
 
-loadLatestRelease();
+// ===== خط مسح AI (مشهد 5) =====
+function drawAIScan(c, t) {
+  c.save();
+  const cx=W/2, cy=H/2-20, radius=Math.min(W,H)*0.22;
+  scanAngle += 0.025;
+  c.strokeStyle='rgba(0,200,150,0.15)'; c.lineWidth=1;
+  c.beginPath(); c.arc(cx,cy,radius,0,Math.PI*2); c.stroke();
+  c.beginPath(); c.arc(cx,cy,radius*0.7,0,Math.PI*2); c.stroke();
+  const grad = c.createConicGradient(scanAngle, cx, cy);
+  grad.addColorStop(0, 'rgba(0,200,150,0.6)');
+  grad.addColorStop(0.15, 'rgba(0,200,150,0)');
+  grad.addColorStop(1, 'rgba(0,200,150,0)');
+  c.strokeStyle = grad; c.lineWidth = 3;
+  c.beginPath(); c.arc(cx,cy,radius,0,Math.PI*2); c.stroke();
+  for (let i = 0; i < 8; i++) {
+    const a=(i/8)*Math.PI*2+t*0.0005;
+    const px=cx+Math.cos(a)*radius, py=cy+Math.sin(a)*radius;
+    const blink=Math.sin(t*0.005+i)>0?1:0.3;
+    c.fillStyle=`rgba(0,200,150,${blink*0.8})`; c.shadowColor='rgba(0,200,150,0.6)'; c.shadowBlur=8;
+    c.beginPath(); c.arc(px,py,3,0,Math.PI*2); c.fill();
+  }
+  c.restore();
+  drawExcavator(c, cx, cy+radius*0.6, 1.4, 'rgba(0,200,150,0.25)');
+}
 
+// ===== شبكة المؤسسة (مشهد 6) =====
+function initNetNodes() {
+  netNodes = [
+    {x:.15,y:.2},{x:.85,y:.15},{x:.1,y:.5},{x:.9,y:.45},
+    {x:.25,y:.75},{x:.75,y:.8},{x:.5,y:.35}
+  ];
+}
+initNetNodes();
+
+function drawNetwork(c, t) {
+  c.save();
+  const hub=netNodes[6], hx=hub.x*W, hy=hub.y*H;
+  for (let i=0; i<netNodes.length-1; i++) {
+    const n=netNodes[i], nx=n.x*W, ny=n.y*H;
+    c.strokeStyle='rgba(10,95,255,0.12)'; c.lineWidth=1;
+    c.beginPath(); c.moveTo(hx,hy); c.lineTo(nx,ny); c.stroke();
+    const prog=((t*0.0008+i*0.15)%1);
+    const px=hx+(nx-hx)*prog, py=hy+(ny-hy)*prog;
+    c.fillStyle='rgba(10,95,255,0.8)'; c.shadowColor='rgba(10,95,255,0.6)'; c.shadowBlur=10;
+    c.beginPath(); c.arc(px,py,3,0,Math.PI*2); c.fill(); c.shadowBlur=0;
+  }
+  netNodes.forEach((n,i) => {
+    const nx=n.x*W, ny=n.y*H, isHub=i===6, r=isHub?8:5;
+    c.fillStyle=isHub?'rgba(10,95,255,0.5)':'rgba(10,95,255,0.3)';
+    c.shadowColor='rgba(10,95,255,0.5)'; c.shadowBlur=isHub?20:10;
+    c.beginPath(); c.arc(nx,ny,r,0,Math.PI*2); c.fill();
+    if(isHub){
+      const pr=r+Math.sin(t*0.003)*5+10;
+      c.strokeStyle=`rgba(10,95,255,${0.2-Math.sin(t*0.003)*0.1})`;
+      c.shadowBlur=0; c.lineWidth=1;
+      c.beginPath(); c.arc(nx,ny,pr,0,Math.PI*2); c.stroke();
+    }
+  });
+  c.restore();
+}
+
+// ===== خلفيات =====
+function drawDarkIndustrial(c) {
+  const g=c.createRadialGradient(W/2,H*0.4,0,W/2,H*0.4,W*0.8);
+  g.addColorStop(0,'#0A1530'); g.addColorStop(1,'#030810');
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+}
+function drawGridBg(c) {
+  c.fillStyle='#040C1A'; c.fillRect(0,0,W,H);
+  c.strokeStyle='rgba(10,95,255,0.04)'; c.lineWidth=1;
+  for(let x=0;x<W;x+=50){c.beginPath();c.moveTo(x,0);c.lineTo(x,H);c.stroke();}
+  for(let y=0;y<H;y+=50){c.beginPath();c.moveTo(0,y);c.lineTo(W,y);c.stroke();}
+}
+function drawNetBg(c) {
+  const g=c.createRadialGradient(W/2,H/2,0,W/2,H/2,W*0.7);
+  g.addColorStop(0,'#081830'); g.addColorStop(1,'#030810');
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+}
+function drawSunsetBg(c) {
+  const g=c.createLinearGradient(0,0,0,H);
+  g.addColorStop(0,'#0A1628'); g.addColorStop(0.4,'#1A1040');
+  g.addColorStop(0.65,'#4A1A20'); g.addColorStop(0.8,'#FF6B00');
+  g.addColorStop(0.9,'#FF9A40'); g.addColorStop(1,'#FFC070');
+  c.fillStyle=g; c.fillRect(0,0,W,H);
+  const gy=H*0.78;
+  c.fillStyle='rgba(5,10,20,0.8)'; c.shadowColor='rgba(255,107,0,0.2)'; c.shadowBlur=10;
+  drawExcavator(c,W*0.2,gy,0.6,'rgba(255,107,0,0.15)');
+  drawCrane(c,W*0.55,gy,0.5,'rgba(255,107,0,0.15)');
+  drawTruck(c,W*0.78,gy,0.55,'rgba(255,107,0,0.15)');
+  drawLoader(c,W*0.38,gy+10,0.5,'rgba(255,107,0,0.15)');
+  c.shadowBlur=0;
+  c.fillStyle='rgba(5,8,15,0.95)'; c.fillRect(0,gy+20,W,H-gy);
+}
+
+// ===== الصوت =====
+let audioCtx=null, masterGain=null, droneOscs=[], kickInterval=null;
+
+function initAudio() {
+  audioCtx=new(window.AudioContext||window.webkitAudioContext)();
+  masterGain=audioCtx.createGain(); masterGain.gain.value=soundOn?0.25:0;
+  masterGain.connect(audioCtx.destination);
+  [55,82.41,110].forEach(f=>{
+    const o=audioCtx.createOscillator(); o.type='sine'; o.frequency.value=f;
+    const g=audioCtx.createGain(); g.gain.value=0.04;
+    const fi=audioCtx.createBiquadFilter(); fi.type='lowpass'; fi.frequency.value=300;
+    o.connect(fi); fi.connect(g); g.connect(masterGain); o.start();
+    droneOscs.push({osc:o,gain:g});
+  });
+  [220,277.18,329.63].forEach(f=>{
+    const o=audioCtx.createOscillator(); o.type='sine'; o.frequency.value=f;
+    const g=audioCtx.createGain(); g.gain.value=0.012;
+    const fi=audioCtx.createBiquadFilter(); fi.type='lowpass'; fi.frequency.value=600;
+    o.connect(fi); fi.connect(g); g.connect(masterGain); o.start();
+    droneOscs.push({osc:o,gain:g});
+  });
+  kickInterval=setInterval(()=>{if(playing&&soundOn)playKick();},2000);
+}
+function playKick() {
+  if(!audioCtx)return;
+  const t=audioCtx.currentTime, o=audioCtx.createOscillator();
+  o.frequency.setValueAtTime(150,t); o.frequency.exponentialRampToValueAtTime(30,t+0.15);
+  const g=audioCtx.createGain(); g.gain.setValueAtTime(0.35,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.3);
+  o.connect(g); g.connect(masterGain); o.start(t); o.stop(t+0.3);
+}
+function playWhoosh() {
+  if(!audioCtx||!soundOn)return;
+  const t=audioCtx.currentTime, len=audioCtx.sampleRate*0.4;
+  const buf=audioCtx.createBuffer(1,len,audioCtx.sampleRate);
+  const d=buf.getChannelData(0);
+  for(let i=0;i<len;i++) d[i]=(Math.random()*2-1)*0.2;
+  const src=audioCtx.createBufferSource(); src.buffer=buf;
+  const fi=audioCtx.createBiquadFilter(); fi.type='bandpass';
+  fi.frequency.setValueAtTime(300,t); fi.frequency.exponentialRampToValueAtTime(1500,t+0.15);
+  fi.frequency.exponentialRampToValueAtTime(100,t+0.4); fi.Q.value=2;
+  const g=audioCtx.createGain(); g.gain.setValueAtTime(0,t);
+  g.gain.linearRampToValueAtTime(0.15,t+0.08); g.gain.linearRampToValueAtTime(0,t+0.4);
+  src.connect(fi); fi.connect(g); g.connect(masterGain); src.start(t); src.stop(t+0.4);
+}
+function toggleSound() {
+  soundOn=!soundOn;
+  btnSound.innerHTML=soundOn?'<i class="fas fa-volume-high"></i>':'<i class="fas fa-volume-xmark"></i>';
+  if(soundOn&&!audioCtx)initAudio();
+  if(masterGain)masterGain.gain.value=soundOn?0.25:0;
+}
+
+// ===== إدارة المشاهد =====
+function switchScene(idx) {
+  if(idx===currentSceneIdx)return;
+  if(currentSceneIdx>=0&&currentSceneIdx<sceneEls.length) {
+    sceneEls[currentSceneIdx].classList.remove('active');
+    // إخفاء زر CTA في المشهد 8
+    ctaBtns.forEach(b => b.classList.remove('active-show'));
+  }
+  currentSceneIdx=idx;
+  if(idx>=0&&idx<sceneEls.length) {
+    sceneEls[idx].classList.add('active');
+    // إظهار زر CTA لو مشهد 8
+    if(idx === 7) {
+      setTimeout(() => ctaBtns.forEach(b => b.classList.add('active-show')), 800);
+    }
+  }
+  const pTypes=['blue','blue','white','blue','green','blue','blue','orange'];
+  initParticles([120,80,60,50,80,70,50,100][idx], pTypes[idx]);
+  playWhoosh();
+}
+function getCurrentSceneIndex(t) {
+  for(let i=0;i<SCENES.length;i++) if(t>=SCENES[i].start&&t<SCENES[i].end) return i;
+  return SCENES.length-1;
+}
+
+// ===== الرسم الرئيسي =====
+function renderScene(t) {
+  const idx=currentSceneIdx;
+  ctx.clearRect(0,0,W,H);
+  switch(idx) {
+    case 0:
+      drawDarkIndustrial(ctx);
+      const sg='rgba(10,95,255,0.2)';
+      drawCrane(ctx,W*0.15,H*0.85,0.8,sg);
+      drawExcavator(ctx,W*0.5,H*0.88,0.9,sg);
+      drawTruck(ctx,W*0.8,H*0.87,0.7,sg);
+      drawLoader(ctx,W*0.35,H*0.9,0.6,sg);
+      const sx=((t*0.15)%(W+400))-200;
+      const swg=ctx.createLinearGradient(sx-100,0,sx+100,0);
+      swg.addColorStop(0,'rgba(10,95,255,0)'); swg.addColorStop(0.5,'rgba(10,95,255,0.06)'); swg.addColorStop(1,'rgba(10,95,255,0)');
+      ctx.fillStyle=swg; ctx.fillRect(0,H*0.6,W,H*0.4);
+      break;
+    case 1:
+      ctx.fillStyle='#040C1A'; ctx.fillRect(0,0,W,H);
+      drawPerspectiveGrid(ctx,t*1000);
+      break;
+    case 2:
+      drawGridBg(ctx);
+      const cg=ctx.createRadialGradient(W/2,H/2,0,W/2,H/2,W*0.4);
+      cg.addColorStop(0,'rgba(10,95,255,0.04)'); cg.addColorStop(1,'rgba(10,95,255,0)');
+      ctx.fillStyle=cg; ctx.fillRect(0,0,W,H);
+      break;
+    case 3:
+      drawDarkIndustrial(ctx);
+      const wg=ctx.createLinearGradient(0,0,0,H);
+      wg.addColorStop(0,'rgba(10,30,80,0.3)'); wg.addColorStop(0.5,'rgba(255,107,0,0.03)'); wg.addColorStop(1,'rgba(5,10,20,0.8)');
+      ctx.fillStyle=wg; ctx.fillRect(0,0,W,H);
+      const ox=W/2, oy=H*0.35;
+      [{x:W*.2,y:H*.85},{x:W*.5,y:H*.9},{x:W*.8,y:H*.85}].forEach((fp,i)=>{
+        ctx.strokeStyle=`rgba(10,95,255,${0.1+Math.sin(t*0.003+i)*0.05})`; ctx.lineWidth=1; ctx.setLineDash([4,4]);
+        ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(fp.x,fp.y); ctx.stroke(); ctx.setLineDash([]);
+        ctx.fillStyle='rgba(10,95,255,0.4)'; ctx.shadowColor='rgba(10,95,255,0.5)'; ctx.shadowBlur=6;
+        ctx.beginPath(); ctx.arc(fp.x,fp.y,3,0,Math.PI*2); c.fill(); ctx.shadowBlur=0;
+      });
+      drawExcavator(ctx,W*0.18,H*0.88,0.5,'rgba(10,95,255,0.12)');
+      drawCrane(ctx,W*0.5,H*0.9,0.4,'rgba(10,95,255,0.12)');
+      drawTruck(ctx,W*0.82,H*0.88,0.45,'rgba(10,95,255,0.12)');
+      break;
+    case 4:
+      drawDarkIndustrial(ctx);
+      drawAIScan(ctx,t*1000);
+      break;
+    case 5:
+      drawNetBg(ctx);
+      drawNetwork(ctx,t*1000);
+      break;
+    case 6:
+      drawGridBg(ctx);
+      const clY=H*0.15+Math.sin(t*0.002)*5;
+      ctx.strokeStyle='rgba(10,95,255,0.1)'; ctx.lineWidth=1; ctx.setLineDash([3,3]);
+      ctx.beginPath(); ctx.moveTo(W/2,clY+20); ctx.lineTo(W*0.3,H*0.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(W/2,clY+20); ctx.lineTo(W*0.7,H*0.5); ctx.stroke();
+      ctx.setLineDash([]);
+      break;
+    case 7:
+      drawSunsetBg(ctx);
+      break;
+  }
+  particles.forEach(p=>{p.update();p.draw(ctx);});
+}
+
+function updateUI() {
+  progressBar.style.width=Math.min(100,(currentTime/TOTAL_DUR)*100)+'%';
+  const m=String(Math.floor(currentTime/60)).padStart(2,'0');
+  const s=String(Math.floor(currentTime%60)).padStart(2,'0');
+  timeDisplay.textContent=`${m}:${s} / 01:00`;
+}
+
+// ===== الحلقة الرئيسية =====
+function loop(ts) {
+  if(!playing){lastFrame=0;return;}
+  if(!lastFrame)lastFrame=ts;
+  const dt=(ts-lastFrame)/1000; lastFrame=ts;
+  currentTime+=dt;
+  if(currentTime>=TOTAL_DUR){currentTime=TOTAL_DUR;playing=false;btnPause.innerHTML='<i class="fas fa-play"></i>';}
+  const idx=getCurrentSceneIndex(currentTime);
+  if(idx!==currentSceneIdx)switchScene(idx);
+  renderScene(currentTime*1000);
+  updateUI();
+  requestAnimationFrame(loop);
+}
+
+function togglePlay() {
+  if(currentTime>=TOTAL_DUR){restart();return;}
+  playing=!playing;
+  btnPause.innerHTML=playing?'<i class="fas fa-pause"></i>':'<i class="fas fa-play"></i>';
+  if(playing)requestAnimationFrame(loop);
+}
+function restart() {
+  currentTime=0; currentSceneIdx=-1;
+  sceneEls.forEach(el=>el.classList.remove('active'));
+  ctaBtns.forEach(b => b.classList.remove('active-show'));
+  switchScene(0); playing=true;
+  btnPause.innerHTML='<i class="fas fa-pause"></i>';
+  lastFrame=0; requestAnimationFrame(loop);
+}
+
+progressWrap.addEventListener('click',e=>{
+  const r=progressWrap.getBoundingClientRect();
+  currentTime=Math.max(0,Math.min(TOTAL_DUR,((e.clientX-r.left)/r.width)*TOTAL_DUR));
+  const idx=getCurrentSceneIndex(currentTime);
+  if(idx!==currentSceneIdx)switchScene(idx);
+  updateUI();
+  if(!playing)renderScene(currentTime*1000);
+});
+
+btnPause.addEventListener('click',togglePlay);
+btnRestart.addEventListener('click',restart);
+btnSound.addEventListener('click',toggleSound);
+
+document.addEventListener('keydown',e=>{
+  if(e.code==='Space'){e.preventDefault();togglePlay();}
+  if(e.code==='KeyR')restart();
+  if(e.code==='KeyM')toggleSound();
+});
+
+document.getElementById('play-btn').addEventListener('click',()=>{
+  startScreen.classList.add('hidden');
+  cinema.classList.add('active');
+  setTimeout(()=>{
+    switchScene(0); playing=true; lastFrame=0;
+    requestAnimationFrame(loop);
+  },400);
+});
+
+// خلفية شاشة البدء
+function renderStartBg() {
+  if(cinema.classList.contains('active'))return;
+  ctx.fillStyle='#050B1A'; ctx.fillRect(0,0,W,H);
+  particles.forEach(p=>{p.update();p.draw(ctx);});
+  requestAnimationFrame(renderStartBg);
+}
+renderStartBg();
 </script>
-
 </body>
 </html>
