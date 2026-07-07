@@ -30,16 +30,21 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Release
+      - name: Publish Release
         uses: softprops/action-gh-release@v2
         with:
-          tag_name: latest
-          name: ELAMAR Latest Release
+          tag_name: v1.${{ github.run_number }}
+          name: ELAMAR v1.${{ github.run_number }}
           generate_release_notes: true
+          make_latest: true
           files: |
             dist/*.exe
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            اضغط على الملف أدناه للتحميل / Click the file below to download
+          body: |
+            ## ⬇️ Download ELAMAR ERP
+
+            اضغط على ملف EXE الموجود بالأسفل لتحميل البرنامج.
+
+            Click the EXE file below to download the latest version.
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
