@@ -1,0 +1,63 @@
+# ═══════════════════════════════════════════════════════════
+# GitHub Actions Workflow – البناء التلقائي
+# ═══════════════════════════════════════════════════════════
+# هذا الملف يأمر GitHub بـ:
+#   1. كل ما ترفع ملف جديد على main branch
+#   2. يشغّل Windows Server في السحابة
+#   3. يبني ملف .exe من الكود
+#   4. ينشره في Releases تلقائياً
+#
+# رابط التحميل الثابت:
+#   https://github.com/<اسم-المستخدم>/<اسم-المستودع>/releases/latest
+# ═══════════════════════════════════════════════════════════
+
+name: Build ELAMAR
+
+on:
+  push:
+    branches: [ main ]   # يعمل عند الرفع على main
+
+permissions:
+  contents: write        # ضروري لإنشاء Releases
+
+jobs:
+  build:
+    runs-on: windows-latest   # يستخدم Windows Server
+
+    steps:
+      # الخطوة 1: تحميل الكود من GitHub
+      - uses: actions/checkout@v4
+
+      # الخطوة 2: تثبيت Node.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'        # كاش لتسريع التثبيت
+
+      # الخطوة 3: تثبيت المكتبات (electron, electron-builder)
+      - name: Install
+        run: npm install
+        env:
+          ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+
+      # الخطوة 4: بناء ملف .exe
+      - name: Build
+        run: npm run build:win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          ELECTRON_CACHE: ${{ github.workspace }}/.cache/electron
+          ELECTRON_BUILDER_CACHE: ${{ github.workspace }}/.cache/electron-builder
+
+      # الخطوة 5: نشر الـ .exe في Releases
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v1.${{ github.run_number }}
+          name: "ELAMAR v1.${{ github.run_number }}"
+          files: dist/*.exe
+          body: |
+            ## ⬇️ تحميل / Download ELAMAR
+            اضغط على الملف أدناه للتحميل / Click the file below to download
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
