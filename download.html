@@ -29,12 +29,17 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 #play-btn i{font-size:2rem;color:var(--light-blue);margin-left:4px}
 @keyframes pulse-ring{0%,100%{transform:scale(1);opacity:.5}50%{transform:scale(1.15);opacity:0}}
 
-#dl-btn{padding:.85em 2em;border-radius:50px;border:none;background:linear-gradient(135deg,var(--orange),var(--light-orange));color:#fff;font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.1em;cursor:pointer;transition:all .3s;display:flex;align-items:center;gap:.6em;text-decoration:none;box-shadow:0 4px 25px rgba(255,107,0,0.3);position:relative;overflow:hidden}
-#dl-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity .3s}
-#dl-btn:hover::before{opacity:1}
-#dl-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 6px 35px rgba(255,107,0,0.5)}
-#dl-btn:active{transform:scale(0.97)}
-#dl-btn i{font-size:.9rem}
+.dl-btn{padding:.85em 2em;border-radius:50px;border:none;background:linear-gradient(135deg,var(--orange),var(--light-orange));color:#fff;font-family:'Orbitron',sans-serif;font-size:.75rem;font-weight:700;letter-spacing:.1em;cursor:pointer;transition:all .3s;display:inline-flex;align-items:center;gap:.6em;text-decoration:none;box-shadow:0 4px 25px rgba(255,107,0,0.3);position:relative;overflow:hidden}
+.dl-btn::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,0.15),transparent);opacity:0;transition:opacity .3s}
+.dl-btn:hover::before{opacity:1}
+.dl-btn:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 6px 35px rgba(255,107,0,0.5)}
+.dl-btn:active{transform:scale(0.97)}
+.dl-btn i{font-size:.9rem}
+.dl-btn.loading{pointer-events:none;opacity:.85}
+.dl-btn .dl-spinner{display:none;width:16px;height:16px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.dl-btn.loading .dl-spinner{display:block}
+.dl-btn.loading .dl-icon{display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 .hint-text{margin-top:1.2em;font-size:.7rem;color:rgba(255,255,255,0.25);letter-spacing:.08em;text-align:center}
 
 /* ===== حاوية السينمائي ===== */
@@ -174,10 +179,19 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 .cta-btn{display:inline-flex;align-items:center;gap:.6em;margin-top:1.5em;padding:.9em 2.5em;background:linear-gradient(135deg,var(--orange),var(--light-orange));color:#fff;font-family:'Orbitron',sans-serif;font-size:clamp(.8rem,1.4vw,1rem);font-weight:700;letter-spacing:.12em;border:none;border-radius:50px;cursor:pointer;text-decoration:none;opacity:0;transform:translateY(15px);transition:all .6s .8s;position:relative;z-index:5;box-shadow:0 4px 30px rgba(255,107,0,0.3)}
 .cta-btn.active-show{opacity:1;transform:translateY(0)}
 .cta-btn:hover{transform:translateY(-2px) scale(1.04)!important;box-shadow:0 6px 40px rgba(255,107,0,0.5)}
+.cta-btn.loading{pointer-events:none;opacity:.85!important}
+.cta-btn .dl-spinner{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin .6s linear infinite}
+.cta-btn.loading .dl-spinner{display:block}
+.cta-btn.loading .dl-icon{display:none}
 #s8 .final-url{font-size:clamp(.6rem,1vw,.78rem);color:var(--muted);margin-top:1em;text-align:center;opacity:0;transition:opacity .5s 1.1s;z-index:5;position:relative;direction:ltr;font-family:'Orbitron',sans-serif;letter-spacing:.05em}
 #s8.active .final-url{opacity:1}
 #s8 .glow-orb{position:absolute;width:300px;height:300px;border-radius:50%;background:radial-gradient(circle,rgba(10,95,255,0.15),transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);z-index:2;animation:orb-breathe 3s infinite ease-in-out}
 @keyframes orb-breathe{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:.6}50%{transform:translate(-50%,-50%) scale(1.3);opacity:1}}
+
+/* ===== Toast إشعار ===== */
+.toast{position:fixed;bottom:60px;left:50%;transform:translateX(-50%) translateY(20px);background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.3);backdrop-filter:blur(12px);color:#FF5078;font-size:.8rem;padding:.7em 1.5em;border-radius:10px;z-index:9999;opacity:0;transition:all .4s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:rgba(0,200,150,0.12);border-color:rgba(0,200,150,0.3);color:#00C896}
 
 /* ===== شريط التقدم ===== */
 #progress-wrap{position:fixed;bottom:0;left:0;right:0;height:4px;background:rgba(255,255,255,0.06);z-index:100;cursor:pointer}
@@ -203,7 +217,7 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
   .ai-data-cards{display:none}
   .office-frame{width:95%}
   .net-label{font-size:.55rem;padding:.2rem .4rem}
-  #dl-btn{padding:.7em 1.4em;font-size:.65rem}
+  .dl-btn{padding:.7em 1.4em;font-size:.65rem}
 }
 @media(prefers-reduced-motion:reduce){
   *{animation-duration:0s!important;transition-duration:0.3s!important}
@@ -212,13 +226,20 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
 </head>
 <body>
 
+<!-- Toast إشعار -->
+<div class="toast" id="toast"></div>
+
 <!-- شاشة البدء -->
 <div id="start-screen">
   <div class="logo-pre">ELAMAR ERP</div>
   <div class="sub-pre">SMART EQUIPMENT MANAGEMENT SYSTEM</div>
   <div class="btns-row">
     <button id="play-btn" aria-label="تشغيل الإعلان"><i class="fas fa-play"></i></button>
-    <a id="dl-btn" href="https://mohamed-shemis.github.io/elamar-app/download.html" target="_blank" aria-label="تحميل البرنامج"><i class="fas fa-download"></i> DOWNLOAD NOW</a>
+    <button class="dl-btn" id="dl-btn" aria-label="تحميل البرنامج">
+      <i class="fas fa-download dl-icon"></i>
+      <span class="dl-spinner"></span>
+      DOWNLOAD NOW
+    </button>
   </div>
   <div class="hint-text">SPACE = Play/Pause &nbsp;&bull;&nbsp; M = Sound &nbsp;&bull;&nbsp; R = Restart</div>
 </div>
@@ -327,8 +348,12 @@ canvas#bg{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0}
     <div class="glow-orb"></div>
     <div class="final-logo"><span>ELAMAR ERP</span></div>
     <div class="final-sub">نظام إدارة المعدات الذكي</div>
-    <a href="https://mohamed-shemis.github.io/elamar-app/download.html" target="_blank" class="cta-btn"><i class="fas fa-download"></i> DOWNLOAD NOW</a>
-    <div class="final-url">mohamed-shemis.github.io/elamar-app/download.html</div>
+    <button class="cta-btn" id="cta-dl-btn" aria-label="تحميل البرنامج">
+      <i class="fas fa-download dl-icon"></i>
+      <span class="dl-spinner"></span>
+      DOWNLOAD NOW
+    </button>
+    <div class="final-url">mohamed-shemis.github.io/elamar-app</div>
   </div>
 
   <div id="progress-wrap"><div id="progress-bar"></div></div>
@@ -356,8 +381,77 @@ const SCENES = [
   { id:'s8', start:50, end:60 }
 ];
 const TOTAL_DUR = 60;
-const DOWNLOAD_URL = 'https://mohamed-shemis.github.io/elamar-app/download.html';
 
+/* ===== GitHub API - تحميل آخر إصدار مباشرة ===== */
+const GITHUB_API = 'https://api.github.com/repos/mohamed-shemis/elamar-app/releases/latest';
+
+/* إظهار Toast */
+function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (type === 'success' ? ' success' : '');
+  requestAnimationFrame(() => t.classList.add('show'));
+  setTimeout(() => t.classList.remove('show'), 3500);
+}
+
+/* تحميل آخر إصدار من GitHub بدون فتح صفحة */
+async function downloadLatestRelease(btnEl) {
+  btnEl.classList.add('loading');
+  try {
+    const res = await fetch(GITHUB_API);
+    if (!res.ok) throw new Error('API Error ' + res.status);
+    const data = await res.json();
+
+    /* البحث عن ملف .exe في Assets */
+    const exeAsset = data.assets.find(a =>
+      a.name.toLowerCase().endsWith('.exe') ||
+      a.name.toLowerCase().endsWith('.msi') ||
+      a.name.toLowerCase().endsWith('.zip')
+    );
+
+    if (!exeAsset) {
+      /* لو مفيش ملف تنفيذي، نجيب أول Asset متاح */
+      if (data.assets.length > 0) {
+        triggerDownload(data.assets[0].browser_download_url, data.assets[0].name);
+      } else {
+        throw new Error('No downloadable assets found');
+      }
+    } else {
+      triggerDownload(exeAsset.browser_download_url, exeAsset.name);
+    }
+
+    /* إشعار نجاح يعرض اسم الإصدار */
+    const verName = data.tag_name || data.name || 'Latest';
+    showToast('Downloading ' + verName + ' ...', 'success');
+  } catch (err) {
+    console.error('Download error:', err);
+    showToast('Connection error - please try again', 'error');
+  } finally {
+    /* شيل اللودينج بعد ثانية عشان الملف يبدأ يتحمل */
+    setTimeout(() => btnEl.classList.remove('loading'), 1000);
+  }
+}
+
+/* تفعيل التحميل المباشر */
+function triggerDownload(url, filename) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename || '';
+  a.style.display = 'none';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => document.body.removeChild(a), 200);
+}
+
+/* ربط أزرار التحميل */
+document.getElementById('dl-btn').addEventListener('click', function() {
+  downloadLatestRelease(this);
+});
+document.getElementById('cta-dl-btn').addEventListener('click', function() {
+  downloadLatestRelease(this);
+});
+
+/* ===== Canvas & Animation Engine ===== */
 const canvas = document.getElementById('bg');
 const ctx = canvas.getContext('2d');
 const startScreen = document.getElementById('start-screen');
@@ -649,13 +743,11 @@ function switchScene(idx) {
   if(idx===currentSceneIdx)return;
   if(currentSceneIdx>=0&&currentSceneIdx<sceneEls.length) {
     sceneEls[currentSceneIdx].classList.remove('active');
-    // إخفاء زر CTA في المشهد 8
     ctaBtns.forEach(b => b.classList.remove('active-show'));
   }
   currentSceneIdx=idx;
   if(idx>=0&&idx<sceneEls.length) {
     sceneEls[idx].classList.add('active');
-    // إظهار زر CTA لو مشهد 8
     if(idx === 7) {
       setTimeout(() => ctaBtns.forEach(b => b.classList.add('active-show')), 800);
     }
@@ -706,7 +798,7 @@ function renderScene(t) {
         ctx.strokeStyle=`rgba(10,95,255,${0.1+Math.sin(t*0.003+i)*0.05})`; ctx.lineWidth=1; ctx.setLineDash([4,4]);
         ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(fp.x,fp.y); ctx.stroke(); ctx.setLineDash([]);
         ctx.fillStyle='rgba(10,95,255,0.4)'; ctx.shadowColor='rgba(10,95,255,0.5)'; ctx.shadowBlur=6;
-        ctx.beginPath(); ctx.arc(fp.x,fp.y,3,0,Math.PI*2); c.fill(); ctx.shadowBlur=0;
+        ctx.beginPath(); ctx.arc(fp.x,fp.y,3,0,Math.PI*2); ctx.fill(); ctx.shadowBlur=0;
       });
       drawExcavator(ctx,W*0.18,H*0.88,0.5,'rgba(10,95,255,0.12)');
       drawCrane(ctx,W*0.5,H*0.9,0.4,'rgba(10,95,255,0.12)');
